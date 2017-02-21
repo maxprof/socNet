@@ -1,0 +1,208 @@
+@media (min-width: 768px) {
+    .omb_row-sm-offset-3 div:first-child[class*="col-"] {
+        margin-left: 25%;
+    }
+}
+
+.omb_login .omb_authTitle {
+    text-align: center;
+    line-height: 300%;
+}
+
+.omb_login .omb_socialButtons a {
+    color: white; // In yourUse @body-bg
+opacity:0.9;
+}
+.omb_login .omb_socialButtons a:hover {
+    color: white;
+    opacity:1;
+}
+.omb_login .omb_socialButtons .omb_btn-facebook {background: #3b5998;}
+.omb_login .omb_socialButtons .omb_btn-twitter {background: #00aced;}
+.omb_login .omb_socialButtons .omb_btn-google {background: #c32f10;}
+
+
+.omb_login .omb_loginOr {
+    position: relative;
+    font-size: 1.5em;
+    color: #aaa;
+    margin-top: 1em;
+    margin-bottom: 1em;
+    padding-top: 0.5em;
+    padding-bottom: 0.5em;
+}
+.omb_login .omb_loginOr .omb_hrOr {
+    background-color: #cdcdcd;
+    height: 1px;
+    margin-top: 0px !important;
+    margin-bottom: 0px !important;
+}
+.omb_login .omb_loginOr .omb_spanOr {
+    display: block;
+    position: absolute;
+    left: 50%;
+    top: -0.6em;
+    margin-left: -1.5em;
+    background-color: white;
+    width: 3em;
+    text-align: center;
+}
+
+.omb_login .omb_loginForm .input-group.i {
+    width: 2em;
+}
+.omb_login .omb_loginForm  .help-block {
+    color: red;
+}
+
+
+@media (min-width: 768px) {
+    .omb_login .omb_forgotPwd {
+        text-align: right;
+        margin-top:10px;
+    }
+}
+img#avatar {
+    margin: 0 auto;
+}
+ul#news {
+    padding: 0px;
+    margin: 0px;
+}
+ul#news li{
+    list-style-type: none;
+}
+.chat
+{
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.chat li
+{
+    margin-bottom: 10px;
+    padding-bottom: 5px;
+    border-bottom: 1px dotted #B3A9A9;
+}
+
+.chat li.left .chat-body
+{
+    margin-left: 60px;
+}
+
+.chat li.right .chat-body
+{
+    margin-right: 60px;
+}
+
+
+.chat li .chat-body p
+{
+    margin: 0;
+    color: #777777;
+}
+
+.panel .slidedown .glyphicon, .chat .glyphicon
+{
+    margin-right: 5px;
+}
+
+.panel-body
+{
+    overflow-y: scroll;
+    height: 80vh;
+}
+
+::-webkit-scrollbar-track
+{
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+    background-color: #F5F5F5;
+}
+
+::-webkit-scrollbar
+{
+    width: 12px;
+    background-color: #F5F5F5;
+}
+
+::-webkit-scrollbar-thumb
+{
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+    background-color: #555;
+}
+
+.panel.panel-primary {
+    border: 1px solid #e4dbdb;
+}
+img#avatar {
+    width: 95px;
+    height: 80px;
+    border-radius: 100%;
+}
+div#friend {
+    display: block;
+    border-bottom: 1px solid #e4dbdb;
+    width: 100%;
+    height: auto;
+    padding: 10px 0px;
+    float: left;
+}
+.row.chatBlock {
+    border: 1px solid #e4dbdb;
+    height: 90vh;
+}
+.col-md-9.messagessBlock{
+    margin: 0px;
+    padding: 0px;
+}
+.col-md-3.friendBlock{
+    padding: 0;
+}
+.noMessagess {
+    border: 1px solid #e4dbdb;
+    height: 90vh;
+}
+.noMessagess > h3{
+    margin-top: 50%;
+}
+img.img-responsive.messageAutor {
+    width: 90px;
+    height: 85px;
+    border-radius: 75%;
+    padding: 5px;
+}
+.width100{
+    width:100%;
+}
+.card-header {
+    padding: .75rem 1.25rem;
+    margin-bottom: 0;
+    background-color: #f7f7f9;
+    border-bottom: 1px solid rgba(0,0,0,.125);
+}
+.card {
+    position: relative;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -webkit-flex-direction: column;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    background-color: #fff;
+    border: 1px solid rgba(0,0,0,.125);
+    border-radius: .25rem;
+}
+.card-block {
+    -webkit-box-flex: 1;
+    -webkit-flex: 1 1 auto;
+    -ms-flex: 1 1 auto;
+    flex: 1 1 auto;
+    padding: 1.25rem;
+}
+.col-md-4.subscriber {
+    margin: 10px 0px;
+}

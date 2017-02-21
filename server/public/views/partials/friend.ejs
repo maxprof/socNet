@@ -1,0 +1,12 @@
+<div class="row">
+    <div class="col-md-2">
+        <% if (item.avatar) {%>
+            <img src="<%- item.avatar.path %>" class="img-thumbnail" alt="">
+        <% } else { %>
+            <img src="../public/uploads/avatar/no-photo.png" class="img-thumbnail" alt="">
+        <% } %>
+    </div>
+    <div class="col-md-9">
+        <p><%= item.name %> <%= item.surname %></p>
+    </div>
+</div>

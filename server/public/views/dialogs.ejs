@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <link rel="stylesheet" href="../public/views/style.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+</head>
+<body>
+<% include partials/header %>
+<br>
+<br>
+<div class="container">
+    <div class="row chatBlock">
+        <div class="col-md-3 friendBlock">
+            <% user.friends.forEach((item)=> { %>
+                <a href="#" id="friend_<%= item._id %>" onclick="switchRoom('<%= item._id %>,<%= user._id %>')">
+                    <div id="friend">
+                        <div class="col-md-6">
+                            <% if (!item.avatar) {%>
+                            <img src="../public/uploads/avatar/avatar.gif" id="avatar" alt="" class="img-responsive messageAvatar">
+                            <%} else {%>
+                            <img src="<%= item.avatar.path %>" id="avatar" alt="" class="img-responsive messageAvatar">
+                            <% } %>
+                        </div>
+                        <div class="col-md-6">
+                            <p><%= item.name %> <%= item.surname %></p>
+                        </div>
+                    </div>
+                </a>
+            <% }) %>
+
+        </div>
+        <div class="col-md-9 messagessBlock" >
+            <div class="noMessagess" id="cap">
+                <h3 class="text-center">Please choose the dialog</h3>
+            </div>
+
+            <div class="panel panel-primary hidden" id="chatBoard">
+                <div class="panel-body">
+                    <ul class="chat">
+
+
+                        <!--<li class="left clearfix">-->
+                            <!--<span class="chat-img pull-left">-->
+                                <!--<img src="http://placehold.it/50/55C1E7/fff&text=U" alt="User Avatar" class="img-circle" />-->
+                            <!--</span>-->
+                            <!--<div class="chat-body clearfix">-->
+                                <!--<div class="header">-->
+                                    <!--<strong class="primary-font">Jack Sparrow</strong> <small class="pull-right text-muted">-->
+                                        <!--<span class="glyphicon glyphicon-time"></span>12 mins ago</small>-->
+                                <!--</div>-->
+                                <!--<p>-->
+                                    <!--Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur bibendum ornare-->
+                                    <!--dolor, quis ullamcorper ligula sodales.-->
+                                <!--</p>-->
+                            <!--</div>-->
+                        <!--</li>-->
+
+
+                        <!--<li class="right clearfix">-->
+                            <!--<span class="chat-img pull-right">-->
+                                <!--<img src="http://placehold.it/50/FA6F57/fff&text=ME" alt="User Avatar" class="img-circle" />-->
+                            <!--</span>-->
+                            <!--<div class="chat-body clearfix">-->
+                                <!--<div class="header">-->
+                                    <!--<small class=" text-muted"><span class="glyphicon glyphicon-time"></span>13 mins ago</small>-->
+                                    <!--<strong class="pull-right primary-font">Bhaumik Patel</strong>-->
+                                <!--</div>-->
+                                <!--<p>-->
+                                    <!--Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur bibendum ornare-->
+                                    <!--dolor, quis ullamcorper ligula sodales.-->
+                                <!--</p>-->
+                            <!--</div>-->
+                        <!--</li>-->
+
+
+                    </ul>
+                </div>
+                <div class="panel-footer">
+                    <div class="input-group">
+                        <input id="btn-input messageValue" type="text" class="form-control input-sm" placeholder="Type your message here..." />
+                        <span class="input-group-btn">
+                            <button class="btn btn-warning btn-sm" id="btn-chat" onclick="sendMessage()">
+                                Send</button>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+</div>
+    <% i = 0 %>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        var i = 0;
+        var socket = io.connect('http://localhost:5000');
+        socket.emit('sendUser', '<%= user._id %>');
+        socket.on('outputMessages', (username, userObj, data) => {
+            console.log(data);
+            data.forEach((data)=> {
+                if (userObj._id == data.author[0]._id){
+                    $('.chat').append(`
+                          <li class="left clearfix">
+                            <span class="chat-img_${i} pull-left">
+                            </span>
+                            <div class="chat-body clearfix">
+                                <div class="header">
+                                    <strong class="primary-font_${i}"></strong> <small class="pull-right text-muted">
+                                        <span class="glyphicon glyphicon-time"></span>12 mins ago</small>
+                                </div>
+                                <p class="messageBox" id="messageBox_${i}">
+                                </p>
+                            </div>
+                        </li>
+                `);
+                    $('#messageBox_'+i).append(data.message);
+                    $('.primary-font_'+i).append(data.author[0].name + " " +data.author[0].surname);
+                    $('.chat-img_'+i).append('<img src="'+ userObj.avatar.path +'" class="img-responsive messageAutor" >');
+                    i++;
+                } else {
+                    $('.chat').append(`
+                        <li class="right clearfix">
+                            <span class="chat-img_${i} pull-right">
+                            </span>
+                            <div class="chat-body clearfix">
+                                <div class="header">
+                                    <small class=" text-muted"><span class="glyphicon glyphicon-time"></span>13 mins ago</small>
+                                    <strong class="pull-right primary-font_${i}"></strong>
+                                </div>
+                                 <p class="messageBox" id="messageBox_${i}">
+                                </p>
+                            </div>
+                        </li>
+                `);
+                    $('#messageBox_'+i).append(data.message);
+                    $('.primary-font_'+i).append(data.author[0].name + " " +data.author[0].surname);
+                    $('.chat-img_'+i).append('<img src="'+ data.author[0].avatar.path +'" class="img-responsive messageAutor" >')
+                    i++;
+                }
+            })
+        });
+        socket.on('showChat', () => {
+            console.log("Show chat")
+            showChat();
+        });
+        socket.on('clearChat', ()=>{
+            clearChat();
+        })
+        socket.on('updatechat', function(username, userObj, data) {
+            if (userObj._id == '<%= user._id %>'){
+                 $('.chat').append(`
+                          <li class="left clearfix">
+                            <span class="chat-img_${i} pull-left">
+                            </span>
+                            <div class="chat-body clearfix">
+                                <div class="header">
+                                    <strong class="primary-font_${i}"></strong> <small class="pull-right text-muted">
+                                        <span class="glyphicon glyphicon-time"></span>12 mins ago</small>
+                                </div>
+                                <p class="messageBox" id="messageBox_${i}">
+                                </p>
+                            </div>
+                        </li>
+                `);
+                $('#messageBox_'+i).append(data);
+                $('.primary-font_'+i).append(username);
+                $('.chat-img_'+i).append('<img src="'+ userObj.avatar.path +'" class="img-responsive messageAutor" >')
+                i++;
+            } else {
+                $('.chat').append(`
+                        <li class="right clearfix">
+                            <span class="chat-img_${i} pull-right">
+                            </span>
+                            <div class="chat-body clearfix">
+                                <div class="header">
+                                    <small class=" text-muted"><span class="glyphicon glyphicon-time"></span>13 mins ago</small>
+                                    <strong class="pull-right primary-font_${i}"></strong>
+                                </div>
+                                 <p class="messageBox" id="messageBox_${i}">
+                                </p>
+                            </div>
+                        </li>
+                `);
+                $('#messageBox_'+i).append(data);
+                $('.primary-font_'+i).append(username);
+                $('.chat-img_'+i).append('<img src="'+ userObj.avatar.path +'" class="img-responsive messageAutor" >')
+                i++;
+            }
+        });
+        function sendMessage(){
+            var message =  $('.input-sm').val();
+            $('.input-sm').val("");
+            socket.emit('saveMEssage', message)
+            if (message && message != '') socket.emit('sendMessage', message);
+        }
+        function switchRoom(usersIDs) {
+            socket.emit('switchRoom', usersIDs);
+        }
+        function showChat(){
+            $('#cap').addClass('hidden');
+            $('#chatBoard').removeClass('hidden');
+        }
+        function clearChat(){
+            console.log("Clear");
+            $('.chat').empty();
+        }
+        $(function(){
+            $('.input-sm').keypress(function(e) {
+                if (e.which == 13) {
+                    $(this).blur();
+                    $('#btn-chat').focus().click();
+                }
+            });
+        })
+    </script>
+</body>
+</html>

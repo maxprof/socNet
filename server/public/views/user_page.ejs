@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <link rel="stylesheet" href="../public/views/style.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+</head>
+<body>
+    <% include partials/header %>
+    <div class="clearfix"></div>
+    <div class="container">
+        <div class="row">
+            <br>
+            <br>
+            <% if (reqUser) {%>
+                <div class="col-md-4">
+            <% } else { %>
+                <div class="col-md-4">
+            <% } %>
+                    <div class="well">
+                        <% if (!user.avatar) {%>
+                            <img src="../public/uploads/avatar/avatar.gif" alt="" class="img-responsive">
+                        <%} else {%>
+                            <img src="<%= user.avatar.path %>" alt="" class="img-responsive">
+                        <% } %>
+                        <% if (reqUser) {%>
+                            <form action='/avatar' method='post' enctype='multipart/form-data' class="group_form" name="avatar">
+                                <input name='file' id='file' type='file' value="file" class="form-control">
+                                <input type='submit' value='Add avatar' class="btn btn-primary form-control">
+                            </form>
+                        <%}%>
+                    </div>
+                    <% if (user.friends.length > 0) {%>
+                    <div class="well">
+                        <div class="friends-block">
+                            <h3 class="text-center">Friends</h3>
+                            <ul id="friends"></ul>
+                        </div>
+                    </div>
+                    <% } else {%>
+                    <div class="well">
+                        <div class="friends-block">
+                            <h3 class="text-center">Friends</h3>
+                            <h3 class="text-center">You have no friends</h3>
+                        </div>
+                    </div>
+                    <% } %>
+                </div>
+                <div class="col-md-8">
+                    <div class="well">
+                        <h4 class="username"><%= user.name + " " + user.surname %></h4>
+                        <p>Gender: <%= user.gender %> </p>
+                        <p>Birthday: <%= user.day +'/'+user.month+'/'+user.year %> </p>
+                    </div>
+                    <div class="clearfix"></div>
+                    <% if (reqUser) {%>
+                    <div class="well">
+                        <ul class="user-info" id="user-info"></ul>
+                    </div>
+                    <% } %>
+                </div>
+                <% if (reqUser) { %>
+                    <div class="col-md-8">
+                        <div class="well">
+                            <form action="/news/new" method="post" enctype='multipart/form-data' name="news" id="newsForm">
+                                <input type="text" name="title" placeholder="title" class="form-control">
+                                <input type="text" name="description" placeholder="description" class="form-control">
+                                <input name='file' id='file' type='file' value="file" class="form-control">
+                                <div class="clearfix"></div>
+                                <input type="submit" value="Add news" class="btn btn-primary form-control">
+                            </form>
+                        </div>
+                    </div>
+                <% } %>
+                <div class="col-md-8">
+                    <div class="clearfix"></div>
+                    <% for(var i=0; i<user.news.length; i++) {%>
+                        <div class="well">
+                            <div class="col-md-3">
+                                <% if (user.news[i].creator.avatar) {%>
+                                    <img src="<%= user.news[i].creator.avatar.path %>" id="news-awatar" alt="" class="img-responsive">
+                                <% } else { %>
+                                    <img src="../public/uploads/avatar/avatar.gif" id="news-awatar" alt="" class="img-responsive">
+                                <% } %>
+                            </div>
+                            <div class="col-md-9">
+                                <p class="news-creator">
+                                    <%= user.news[i].creator.name %> <%= user.news[i].creator.surname %>
+                                </p>
+                                <p><%= user.news[i].title %></p>
+                                <p><%= user.news[i].description %></p>
+                                <% if (user.news[i].photo) {%>
+                                    <img src="<%=user.news[i].photo.path %>" alt="" class="img-responsive">
+                                <% } %>
+
+                                <% if (reqUser) { %>
+                                    <form action="/news/like/id<%= user.news[i]._id %>" method="post">
+                                        <input type="text" class="hidden" name="news_id" value="<%= user.news[i]._id %>">
+                                        <% if (user.news[i].likes_persons.indexOf(user._id) == -1)  {%>
+                                        <input type="submit" class="btn btn-primary" value="Like">
+                                        <% } else { %>
+                                        <input type="submit" class="btn btn-primary" value="Dislike">
+                                        <% } %>
+                                        <span class="badge"><%= user.news[i].likes_count %></span>
+                                    </form>
+                                    <% if (JSON.stringify(user.news[i].creator._id) != JSON.stringify(reqUser._id)) {%>
+                                        <form action="/news/repost" method="post">
+                                            <input type="text" class="hidden" name="news_id" value="<%= user.news[i]._id %>">
+                                            <input type="text" class="hidden" name="user_id" value="<%= reqUser._id %>">
+                                            <% if (user.news[i].repost_persons.indexOf(user._id) == -1)  {%>
+                                                <input type="submit" class="btn btn-primary" value="Repost">
+                                            <% } else { %>
+                                                <input type="submit" class="btn btn-primary" value="Unrepost">
+                                            <% } %>
+                                            <span class="badge"><%= user.news[i].repost_count %></span>
+                                        </form>
+                                    <% } %>
+                                <% } %>
+
+                            </div>
+                            <div class="clearfix"></div>
+                        </div>
+                    <% } %>
+                </div>
+                <div class="clearfix"></div>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</body>
+</html>

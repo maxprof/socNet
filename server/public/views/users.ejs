@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <link rel="stylesheet" href="../public/views/style/profile.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+</head>
+<body>
+<% include partials/header %>
+<br>
+<div class="container">
+    <div class="row">
+        <h1>User list</h1>
+        <div class="col-md-8 col-md-offset-1">
+            <% users.forEach(function(item) { %>
+
+                <% if (JSON.stringify(user._id) != JSON.stringify(item._id)) {%>
+                    <% include partials/friend  %>
+                    <% if ((user.subscribers.indexOf(item._id) != -1) && (user.friendsRequests.indexOf(item._id) != -1) ) {%>
+                        <form action="/user/confirm/friend" method="post" enctype='multipart/form-data'>
+                            <input type="text" name="friend_id" value="<%= item._id %>" class="hidden">
+                            <input type="submit" value="Confirm friend" class="btn btn-primary">
+                        </form>
+                    <% } else { %>
+                        <% if ( ((user.friends.indexOf(item._id) == -1) && ((item.subscribers.indexOf(user._id) == -1) || (item.friendsRequests.indexOf(user._id) == -1))) ) {%>
+                        <form action="/user/friend/add" method="post" enctype='multipart/form-data'>
+                            <input type="text" name="friend_id" value="<%= item._id %>" class="hidden">
+                            <input type="submit" value="Add friend" class="btn btn-primary">
+                        </form>
+                        <% } else if ( ((user.friends.indexOf(item._id) == -1) && ((item.subscribers.indexOf(user._id) != -1) || (item.friendsRequests.indexOf(user._id) != -1))) ) {%>
+                        <form action="/user/friend/request/remove" method="post" enctype='multipart/form-data'>
+                            <input type="text" name="friend_id" value="<%= item._id %>" class="hidden">
+                            <input type="submit" value="Remove friend request" class="btn btn-primary">
+                        </form>
+                        <%} else {%>
+                            <button class="btn btn-primary">Write message</button>
+                            <form action="/user/friend/remove" method="post" enctype='multipart/form-data'>
+                                <input type="text" name="friend_id" value="<%= item._id %>" class="hidden">
+                                <input type="submit" value="Remove friend" class="btn btn-primary">
+                            </form>
+                        <% } %>
+                    <% } %>
+
+
+                <% } %>
+            <% }); %>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="../public/views/scripts/profile.js"></script>
+</body>
+</html>

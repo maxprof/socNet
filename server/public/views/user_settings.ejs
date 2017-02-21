@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <link rel="stylesheet" href="../public/views/style/profile.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+</head>
+<body>
+<% include partials/header %>
+<br>
+<br>
+<div class="container">
+    <div class="row">
+        <h1 class="text-center">User settings</h1>
+        <div class="col-md-6 col-md-offset-3">
+            <form class="form-horizontal" action='/user/settings' method='post'>
+                <fieldset>
+                    <!-- first-name input-->
+                    <div class="control-group">
+                        <div class="controls">
+                            <input id="first-name" name="name" type="text" value="<%= user.name %>"
+                                   class="input-xlarge form-control">
+                            <p class="help-block"></p>
+                        </div>
+                    </div>
+                    <!-- last-name input-->
+                    <div class="control-group">
+                        <div class="controls">
+                            <input id="last-name" name="surname" type="text" value="<%= user.surname %>"
+                                   class="input-xlarge form-control">
+                            <p class="help-block"></p>
+                        </div>
+                    </div>
+                    <div class="form-group date-fields">
+                        <div class="form-inline">
+                            <div class="form-group">
+                                <input type="text" class="form-control" placeholder="Year" value="<%= user.year %>" name="year"/>
+                            </div>
+                            <div class="form-group">
+                                <input type="text" class="form-control" placeholder="Month" value="<%= user.month %>" name="month"/>
+                            </div>
+                            <div class="form-group">
+                                <input type="text" class="form-control" placeholder="Day" value="<%= user.day %>" name="day"/>
+                            </div>
+                        </div>
+                    </div>
+                    <h1>Gender: <% user.gender %></h1>
+                    <select class="form-control" name="gender">
+                        <% if (!user.gender) { %>
+                            <option name="gender" value="Female">Female</option>
+                            <option name="gender" value="Male">Male</option>
+                        <% } else { %>
+                            <option name="gender" value="<%= user.gender || 'Male' %>"><%= user.gender || 'Male' %></option>
+                            <% if (user.gender == "Male") {%>
+                                <option name="gender" value="Female">Female</option>
+                            <%} else if (user.gender == "Female" ){%>
+                                <option name="gender" value="Male">Male</option>
+                            <%}%>
+                        <% } %>
+                    </select>
+                    <input type='submit' value='Update user info' class="btn btn-primary" >
+                </fieldset>
+            </form>
+        </div>
+    </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="../public/views/scripts/profile.js"></script>
+</body>
+</html>
