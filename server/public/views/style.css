@@ -206,3 +206,18 @@ img.img-responsive.messageAutor {
 .col-md-4.subscriber {
     margin: 10px 0px;
 }
+body {
+    background-image: url(../uploads/city.jpg);
+    overflow-y: hidden;
+}
+.card.card-signup {
+    padding: 15px;
+    margin: 20px;
+}
+.main_block {
+    height: 96vh;
+    overflow-y: scroll;
+    width: 100%;
+    overflow-x: hidden;
+    padding:0% 5%;
+}

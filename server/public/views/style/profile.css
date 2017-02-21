@@ -193,3 +193,10 @@ i.glyphicon.glyphicon-calendar {
 .form-group.date-fields {
     margin-left: 15px!important;
 }
+.form-control, .form-group .form-control{
+    background-image: none!important;
+}
+
+.main.main-raised {
+    padding: 15px;
+}
