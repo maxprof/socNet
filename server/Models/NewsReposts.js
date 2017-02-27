@@ -13,13 +13,13 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var repostsSchema = new _mongoose2.default.Schema({
     user_id: {
         type: _mongoose2.default.Schema.Types.ObjectId,
-        ref: 'News'
+        ref: 'User'
     },
     news_id: {
         type: _mongoose2.default.Schema.Types.ObjectId,
         ref: 'News'
     },
-    data: { type: Date, default: Date.now }
+    date: { type: Date, default: Date.now }
 });
 
 exports.default = _mongoose2.default.model('NewsReposts', repostsSchema);

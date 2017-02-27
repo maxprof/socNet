@@ -11,6 +11,8 @@ import bcrypt from 'bcrypt-nodejs';
 const fileUpload = require('../Modules/fileUpload');
 const like = require('../Modules/like');
 const repost = require('../Modules/repost');
+import moment from 'moment'
+const _ = require('lodash');
 module.exports = {
     home: (req, res) => {
         res.render('index.ejs', {
@@ -82,17 +84,28 @@ module.exports = {
             })
     },
     userProfile: (req, res, next) => {
-        let obj = req.params.id || req.user._id;
+        let obj = req.params.id;
         if (!obj) helpers.newError("Bad request", 400, (error) => { return next(error) });
         Users
             .findById(obj)
             .populate({path: 'news', options: { sort: '-date' } })
-            .populate('friends avatar groups')
+            .populate({path: 'news_reposts', options: { sort: 'date' }})
+            .populate('friends avatar groups ')
             .exec((err, user) => {
                 if (err)  helpers.newError(err.msg, 500, (error) => { return next(error) });
                 if (!user) helpers.newError("User not found", 404, (error) => { return next(error) });
-                user.deepPopulate('news.creator news.photo friends.avatar news.creator.avatar subscribers subscribers.avatar', (err, user) => {
+                user.deepPopulate('news_reposts.user_id ' +
+                    ' news_reposts.user_id.avatar ' +
+                    ' news_reposts.news_id ' +
+                    ' news_reposts.news_id.creator ' +
+                    ' news_reposts.news_id.creator.avatar ' +
+                    ' news.creator news.photo friends.avatar news.creator.avatar subscribers news_reposts.news_id.photo' +
+                    ' subscribers.avatar', (err, user) => {
+                    if (err) helpers.newError(err.msg, 500, (error) => { return next(error) });
+                    let userNews = _.concat(user.news,user.news_reposts);
+                    let myObjects = _.sortBy(userNews, '-date');
                     res.render('user_page.ejs', {
+                        userNews: myObjects ? myObjects: null,
                         user: user ? user : null,
                         reqUser: req.reqUser ? req.reqUser : null
                     });
@@ -106,6 +119,7 @@ module.exports = {
     },
     settingsPost: (req, res) => {
         let body = req.body;
+        console.log(body);
         req.user.set(body);
         req.user.save((err)=>{ if (err) return helpers.newError(err.msg, 500, (error) => { return next(error) }); });
         res.status(200).redirect('/user/settings');
@@ -113,39 +127,6 @@ module.exports = {
     avatar: (req, res) => {
         fileUpload.fileUpload(req, 'avatar', (err, msg) => {
             return res.status(200).redirect('back');
-        });
-    },
-    newsNewPost: (req, res, next) => {
-        console.log("news creation");
-        const body = req.body;
-        helpers.requestValidation(body, 'news', (err)=>{
-            if (err) return helpers.newError(err, 500, (error) => { return next(error) });
-        });
-        const newNews = new News(body);
-        newNews.creator = req.user._id;
-        newNews.date = Date.now();
-        newNews.save((err, sNews) => {
-            if (err) return helpers.newError(err.message, 500, (error) => { return next(error); });
-            async.waterfall([
-                    function(done){
-                        if (req.files.file.data.length<0) return done(null, 'ok');
-                        fileUpload.fileUpload(req, 'news', function (err, msg) {
-                            sNews.photo = msg.data._id;
-                            sNews.save((err)=> {
-                                if (err) return helpers.newError(err.message, 500, (error) => { return next(error); });
-                            });
-                            return done(null, 'ok');
-                        });
-                    }, function(status, done){
-                        req.user.news.push(sNews._id);
-                        req.user.save();
-                        return done(null, sNews)
-                    }
-                ],
-                function(err){
-                    if (err) return helpers.newError(err, 500, (error) => { return next(error) });
-                    return res.redirect('back');
-                });
         });
     },
     editNewsPost: (req, res, next) => {
@@ -220,15 +201,15 @@ module.exports = {
         Group
             .findById(req.params.id)
             .populate('creator admins subscribers avatar')
-            .populate({path: 'posts', options: { sort: '-date' } })
+            .populate({path: 'news', options: { sort: '-date' } })
             .exec((err, group) => {
             console.log("err", err);
                 if (err) return helpers.newError(err.message, 500, (error) => { return next(error); });
                 if (!group) return helpers.newError("Group not found", 404, (error) => { return next(error); });
-                group.deepPopulate('posts.creator admins.avatar admins subscribers subscribers.avatar posts.creator.avatar posts.photo', (err, group) => {
+                group.deepPopulate('news.creator admins.avatar admins subscribers subscribers.avatar news.creator.avatar news.photo', (err, group) => {
                     res.render('group_page.ejs', {
                         group: group ? group : null,
-                        user: req.user ? req.user : null
+                        user: req.reqUser ? req.reqUser : null
                     });
                 });
             })
@@ -430,10 +411,44 @@ module.exports = {
                 })
             });
     },
+
+    newsNewPost: (req, res, next) => {
+        const body = req.body;
+        helpers.requestValidation(body, 'News', (err)=>{
+            if (err) return helpers.newError(err, 500, (error) => { return next(error) });
+        });
+        const newNews = new News(body);
+        newNews.creator = req.user._id;
+        newNews.date = Date.now();
+        newNews.save((err, sNews) => {
+            if (err) return helpers.newError(err.message, 500, (error) => { return next(error); });
+            async.waterfall([
+                    function(done){
+                        if (req.files.file.data.length<0) return done(null, 'ok');
+                        fileUpload.fileUpload(req, 'news', function (err, msg) {
+                            sNews.photo = msg.data._id;
+                            sNews.save((err)=> {
+                                if (err) return helpers.newError(err.message, 500, (error) => { return next(error); });
+                            });
+                            return done(null, 'ok');
+                        });
+                    }, function(status, done){
+                        req.user.news.push(sNews._id);
+                        req.user.save();
+                        return done(null, sNews)
+                    }
+                ],
+                function(err){
+                    if (err) return helpers.newError(err, 500, (error) => { return next(error) });
+                    return res.redirect('back');
+                });
+        });
+    },
+
     postNew: (req, res, next) => {
         const body = req.body;
         if (!body.group_id)  return helpers.newError("Bad request", 403, (error) => { return next(error) });
-        helpers.requestValidation(body, 'post', (err)=>{
+        helpers.requestValidation(body, 'Post', (err)=>{
             if (err) return helpers.newError(err, 500, (error) => { return next(error) });
         });
         Group
@@ -442,8 +457,7 @@ module.exports = {
                 if (err) return helpers.newError(err.message, 500, (error) => { return next(error); });
                 if (!req.user && ((req.user.id != group.creator) || (group.admins.includes(req.user._id))))
                     return helpers.newError("You can't add post for this group!", 401, (error) => { return next(error) });
-                const body = req.body;
-                const newPost = new Posts(body);
+                const newPost = new News(body);
                 newPost.creator = req.user._id;
                 newPost.date = Date.now();
                 newPost.save((err, sPost) => {
@@ -462,7 +476,7 @@ module.exports = {
                             }, (status, done) => {
                                 req.user.posts.push(sPost._id);
                                 req.user.save();
-                                group.posts.push(sPost._id);
+                                group.news.push(sPost._id);
                                 group.save();
                                 done(null, sPost)
                             }
@@ -527,8 +541,8 @@ module.exports = {
         });
     },
     likePost: (req, res, next) => {
-        if (!req.body.post_id) return helpers.newError("Bad request", 401, (error) => { return next(error); });
-        like.like(Posts, req.body.post_id, req.user._id, err => {
+        if (!req.body.news_id) return helpers.newError("Bad request", 401, (error) => { return next(error); });
+        like.like(News, req.body.news_id, req.user._id, err => {
             if (err) return helpers.newError(err.message, 500, (error) => { return next(error); });
             return res.status(200).redirect("back")
         })

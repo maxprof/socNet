@@ -25,14 +25,14 @@ module.exports = function (app) {
 
     app.get('/sess', helpers.tokenInspection, main_controller.sess);
     app.get('/user/id:id', helpers.profileInspection, main_controller.userProfile);
-    app.get('/user/settings', helpers.profileInspection, helpers.tokenInspection, main_controller.settings);
-    app.post('/user/settings', helpers.profileInspection, helpers.tokenInspection, main_controller.settingsPost);
-    app.post('/avatar', helpers.profileInspection, main_controller.avatar);
-    app.post('/news/new', helpers.profileInspection, main_controller.newsNewPost);
+    app.get('/user/settings', helpers.tokenInspection, main_controller.settings);
+    app.post('/user/settings', helpers.tokenInspection, main_controller.settingsPost);
+    app.post('/avatar', helpers.tokenInspection, main_controller.avatar);
+    app.post('/news/new', helpers.tokenInspection, main_controller.newsNewPost);
     app.post('/news/edit/id:id', main_controller.editNewsPost);
     app.delete('/news/delete/id:id', main_controller.deleteNews);
     app.post('/news/like/id:id', helpers.tokenInspection, main_controller.newsLike);
-    app.post('/news/repost', helpers.profileInspection, main_controller.repostNews);
+    app.post('/news/repost', helpers.tokenInspection, main_controller.repostNews);
 
     app.get('/group/id:id', helpers.profileInspection, main_controller.getGroup);
     app.get('/user/groups', helpers.tokenInspection, main_controller.getMyGroups);
@@ -43,7 +43,6 @@ module.exports = function (app) {
     app.post('/group/edit', helpers.tokenInspection, main_controller.editGroup);
     app.post('/group/subscriber/add', helpers.tokenInspection, main_controller.addGroupSubscriber);
     app.post('/group/subscriber/remove', helpers.tokenInspection, main_controller.removeGroupSubscriber);
-
     app.post('/group/post/edit/id:id', helpers.tokenInspection, main_controller.editGroupPost);
     app.delete('/group/delete/id:id', helpers.tokenInspection, main_controller.deleteGroup);
     app.post('/post/new', helpers.tokenInspection, main_controller.postNew);

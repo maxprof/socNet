@@ -42,11 +42,17 @@ var _bcryptNodejs = require('bcrypt-nodejs');
 
 var _bcryptNodejs2 = _interopRequireDefault(_bcryptNodejs);
 
+var _moment = require('moment');
+
+var _moment2 = _interopRequireDefault(_moment);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var fileUpload = require('../Modules/fileUpload');
 var like = require('../Modules/like');
 var repost = require('../Modules/repost');
+
+var _ = require('lodash');
 module.exports = {
     home: function home(req, res) {
         res.render('index.ejs', {
@@ -131,19 +137,25 @@ module.exports = {
         });
     },
     userProfile: function userProfile(req, res, next) {
-        var obj = req.params.id || req.user._id;
+        var obj = req.params.id;
         if (!obj) _helpers2.default.newError("Bad request", 400, function (error) {
             return next(error);
         });
-        _User2.default.findById(obj).populate({ path: 'news', options: { sort: '-date' } }).populate('friends avatar groups').exec(function (err, user) {
+        _User2.default.findById(obj).populate({ path: 'news', options: { sort: '-date' } }).populate({ path: 'news_reposts', options: { sort: 'date' } }).populate('friends avatar groups ').exec(function (err, user) {
             if (err) _helpers2.default.newError(err.msg, 500, function (error) {
                 return next(error);
             });
             if (!user) _helpers2.default.newError("User not found", 404, function (error) {
                 return next(error);
             });
-            user.deepPopulate('news.creator news.photo friends.avatar news.creator.avatar subscribers subscribers.avatar', function (err, user) {
+            user.deepPopulate('news_reposts.user_id ' + ' news_reposts.user_id.avatar ' + ' news_reposts.news_id ' + ' news_reposts.news_id.creator ' + ' news_reposts.news_id.creator.avatar ' + ' news.creator news.photo friends.avatar news.creator.avatar subscribers news_reposts.news_id.photo' + ' subscribers.avatar', function (err, user) {
+                if (err) _helpers2.default.newError(err.msg, 500, function (error) {
+                    return next(error);
+                });
+                var userNews = _.concat(user.news, user.news_reposts);
+                var myObjects = _.sortBy(userNews, '-date');
                 res.render('user_page.ejs', {
+                    userNews: myObjects ? myObjects : null,
                     user: user ? user : null,
                     reqUser: req.reqUser ? req.reqUser : null
                 });
@@ -157,6 +169,7 @@ module.exports = {
     },
     settingsPost: function settingsPost(req, res) {
         var body = req.body;
+        console.log(body);
         req.user.set(body);
         req.user.save(function (err) {
             if (err) return _helpers2.default.newError(err.msg, 500, function (error) {
@@ -168,44 +181,6 @@ module.exports = {
     avatar: function avatar(req, res) {
         fileUpload.fileUpload(req, 'avatar', function (err, msg) {
             return res.status(200).redirect('back');
-        });
-    },
-    newsNewPost: function newsNewPost(req, res, next) {
-        console.log("news creation");
-        var body = req.body;
-        _helpers2.default.requestValidation(body, 'news', function (err) {
-            if (err) return _helpers2.default.newError(err, 500, function (error) {
-                return next(error);
-            });
-        });
-        var newNews = new _News2.default(body);
-        newNews.creator = req.user._id;
-        newNews.date = Date.now();
-        newNews.save(function (err, sNews) {
-            if (err) return _helpers2.default.newError(err.message, 500, function (error) {
-                return next(error);
-            });
-            _async2.default.waterfall([function (done) {
-                if (req.files.file.data.length < 0) return done(null, 'ok');
-                fileUpload.fileUpload(req, 'news', function (err, msg) {
-                    sNews.photo = msg.data._id;
-                    sNews.save(function (err) {
-                        if (err) return _helpers2.default.newError(err.message, 500, function (error) {
-                            return next(error);
-                        });
-                    });
-                    return done(null, 'ok');
-                });
-            }, function (status, done) {
-                req.user.news.push(sNews._id);
-                req.user.save();
-                return done(null, sNews);
-            }], function (err) {
-                if (err) return _helpers2.default.newError(err, 500, function (error) {
-                    return next(error);
-                });
-                return res.redirect('back');
-            });
         });
     },
     editNewsPost: function editNewsPost(req, res, next) {
@@ -294,7 +269,7 @@ module.exports = {
         if (!req.params.id) return _helpers2.default.newError("Bad request", 400, function (error) {
             return next(error);
         });
-        _Group2.default.findById(req.params.id).populate('creator admins subscribers avatar').populate({ path: 'posts', options: { sort: '-date' } }).exec(function (err, group) {
+        _Group2.default.findById(req.params.id).populate('creator admins subscribers avatar').populate({ path: 'news', options: { sort: '-date' } }).exec(function (err, group) {
             console.log("err", err);
             if (err) return _helpers2.default.newError(err.message, 500, function (error) {
                 return next(error);
@@ -302,10 +277,10 @@ module.exports = {
             if (!group) return _helpers2.default.newError("Group not found", 404, function (error) {
                 return next(error);
             });
-            group.deepPopulate('posts.creator admins.avatar admins subscribers subscribers.avatar posts.creator.avatar posts.photo', function (err, group) {
+            group.deepPopulate('news.creator admins.avatar admins subscribers subscribers.avatar news.creator.avatar news.photo', function (err, group) {
                 res.render('group_page.ejs', {
                     group: group ? group : null,
-                    user: req.user ? req.user : null
+                    user: req.reqUser ? req.reqUser : null
                 });
             });
         });
@@ -549,12 +524,51 @@ module.exports = {
             });
         });
     },
+
+    newsNewPost: function newsNewPost(req, res, next) {
+        var body = req.body;
+        _helpers2.default.requestValidation(body, 'News', function (err) {
+            if (err) return _helpers2.default.newError(err, 500, function (error) {
+                return next(error);
+            });
+        });
+        var newNews = new _News2.default(body);
+        newNews.creator = req.user._id;
+        newNews.date = Date.now();
+        newNews.save(function (err, sNews) {
+            if (err) return _helpers2.default.newError(err.message, 500, function (error) {
+                return next(error);
+            });
+            _async2.default.waterfall([function (done) {
+                if (req.files.file.data.length < 0) return done(null, 'ok');
+                fileUpload.fileUpload(req, 'news', function (err, msg) {
+                    sNews.photo = msg.data._id;
+                    sNews.save(function (err) {
+                        if (err) return _helpers2.default.newError(err.message, 500, function (error) {
+                            return next(error);
+                        });
+                    });
+                    return done(null, 'ok');
+                });
+            }, function (status, done) {
+                req.user.news.push(sNews._id);
+                req.user.save();
+                return done(null, sNews);
+            }], function (err) {
+                if (err) return _helpers2.default.newError(err, 500, function (error) {
+                    return next(error);
+                });
+                return res.redirect('back');
+            });
+        });
+    },
+
     postNew: function postNew(req, res, next) {
         var body = req.body;
         if (!body.group_id) return _helpers2.default.newError("Bad request", 403, function (error) {
             return next(error);
         });
-        _helpers2.default.requestValidation(body, 'post', function (err) {
+        _helpers2.default.requestValidation(body, 'Post', function (err) {
             if (err) return _helpers2.default.newError(err, 500, function (error) {
                 return next(error);
             });
@@ -566,8 +580,7 @@ module.exports = {
             if (!req.user && (req.user.id != group.creator || group.admins.includes(req.user._id))) return _helpers2.default.newError("You can't add post for this group!", 401, function (error) {
                 return next(error);
             });
-            var body = req.body;
-            var newPost = new _Post2.default(body);
+            var newPost = new _News2.default(body);
             newPost.creator = req.user._id;
             newPost.date = Date.now();
             newPost.save(function (err, sPost) {
@@ -589,7 +602,7 @@ module.exports = {
                 }, function (status, done) {
                     req.user.posts.push(sPost._id);
                     req.user.save();
-                    group.posts.push(sPost._id);
+                    group.news.push(sPost._id);
                     group.save();
                     done(null, sPost);
                 }], function (err) {
@@ -662,10 +675,10 @@ module.exports = {
         });
     },
     likePost: function likePost(req, res, next) {
-        if (!req.body.post_id) return _helpers2.default.newError("Bad request", 401, function (error) {
+        if (!req.body.news_id) return _helpers2.default.newError("Bad request", 401, function (error) {
             return next(error);
         });
-        like.like(_Post2.default, req.body.post_id, req.user._id, function (err) {
+        like.like(_News2.default, req.body.news_id, req.user._id, function (err) {
             if (err) return _helpers2.default.newError(err.message, 500, function (error) {
                 return next(error);
             });

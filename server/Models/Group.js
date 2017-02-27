@@ -20,9 +20,9 @@ var groupSchema = new _mongoose2.default.Schema({
     title: String,
     description: String,
     date: Date,
-    posts: [{
+    news: [{
         type: _mongoose2.default.Schema.Types.ObjectId,
-        ref: 'Post'
+        ref: 'News'
     }],
     admins: [{
         type: _mongoose2.default.Schema.Types.ObjectId,
@@ -40,10 +40,10 @@ var groupSchema = new _mongoose2.default.Schema({
 
 groupSchema.plugin(deepPopulate, {
     populate: {
-        'posts.creator': {
+        'news.creator': {
             select: 'avatar name surname'
         },
-        'posts.creator.avatar': {
+        'news.creator.avatar': {
             select: 'name path'
         },
         'admins': {
@@ -58,7 +58,7 @@ groupSchema.plugin(deepPopulate, {
         'subscribers.avatar': {
             select: 'name path'
         },
-        'posts.photo': {
+        'news.photo': {
             select: 'name path'
         }
     }

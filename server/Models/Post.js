@@ -18,18 +18,18 @@ var postSchema = new _mongoose2.default.Schema({
         ref: 'User'
     },
     date: Date,
-    group: {
+    photo: {
         type: _mongoose2.default.Schema.Types.ObjectId,
-        ref: 'Group'
+        ref: 'File'
     },
     likes_count: { type: Number, default: 0 },
     likes_persons: [{
         type: _mongoose2.default.Schema.Types.ObjectId,
         ref: 'User'
     }],
-    photo: {
+    group: {
         type: _mongoose2.default.Schema.Types.ObjectId,
-        ref: 'File'
+        ref: 'Group'
     }
 });
 exports.default = _mongoose2.default.model('Post', postSchema);

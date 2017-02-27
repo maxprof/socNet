@@ -2,78 +2,96 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' name='viewport' />
     <title>Document</title>
-    <link rel="stylesheet" href="../../public/views/style.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.5/jquery.fancybox.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css" />
+    <link href="../../public/views/style/material-kit.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="../../public/views/style.css">
 </head>
 <body>
 <% include partials/header %>
 <div class="clearfix"></div>
 <br>
 <br>
-<div class="container">
-    <div class="row">
+<div class="main_block">
+    <div class="card card-signup">
         <ul class="groupsMenu nav nav-pills nav-justified">
             <li><a href="/user/groups">My groups</a></li>
             <li class="active"><a href="/user/groups/all">All groups</a></li>
-
             <li><a href="/user/groups/admin">Admin</a></li>
-            <li><a id="inline" href="#data" class="btn">Add new group</a></li>
+            <li><a id="inline" href="#" class="btn btn-info"  data-toggle="modal" data-target="#myModal">Add new group</a></li>
         </ul>
         <br>
-        <form action="/group/new" method="post" id="data" style="display:none">
-            <input type="text" name="title" placeholder="title" class="form-control">
-            <br>
-            <textarea name="description" id="" cols="30" rows="10" class="form-contorl"></textarea>
-            <div class="clearfix"></div>
-            <input type="submit" value="Add group" class="btn btn-primary">
-        </form>
-        <div class="clearfix">
-            <% if (groups) {%>
-                <% groups.forEach((group)=> {  %>
-                    <div class="group">
-                        <div class="col-md-3">
-                            <% if (!group.avatar) {%>
-                                <img src="../../public/uploads/avatar/avatar.gif" alt="" class="img-responsive">
-                            <%} else {%>
-                                <img src="<%= group.avatar.path %>"  alt="" class="img-responsive">
-                            <% } %>
-                            <% if ( group.subscribers.indexOf(user._id) == -1) {%>
-                                <form action="/group/subscriber/add" method="post">
-                                    <input type="text" name="user_id" class="form-control hidden" value="<%= user._id %>">
-                                    <input type="text" name="group_id" class="form-control hidden" value="<%= group._id %>">
-                                    <input type="submit" value="Subscribe" class="btn btn-primary">
-                                </form>
-                            <% } else { %>
-                                <form action="/group/subscriber/remove" method="post">
-                                    <input type="text" name="user_id" class="form-control hidden" value="<%= user._id %>">
-                                    <input type="text" name="group_id" class="form-control hidden" value="<%= group._id %>">
-                                    <input type="submit" value="Unsubscribe" class="btn btn-warning">
-                                </form>
-                            <% } %>
-                        </div>
-                        <div class="col-md-7">
-                            <h3><a href="/group/id<%= group._id %>"><%= group.title %></a></h3>
-                            <p><%= group.description %></p>
-                        </div>
-                        <div class="clearfix"></div>
+        <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title" id="myModalLabel">Add new group</h4>
                     </div>
-                    <hr>
-                <% }) %>
-            <% } %>
+                    <div class="modal-body">
+                        <form action="/group/new" method="post">
+                            <div class="form-group">
+                                <input type="text" name="title" placeholder="title" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <textarea name="description" class="form-control" placeholder="Group information" rows="5"></textarea>
+                            </div>
+                            <div class="clearfix"></div>
+                            <input type="submit" value="Add group" class="btn btn-primary">
+                        </form>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-</div>
+    <% if (groups) {%>
+    <% groups.forEach((group)=> {  %>
+    <div class="card card-signup">
+        <div class="col-md-3">
+            <% if (!group.avatar) {%>
+            <img src="../../public/uploads/avatar/avatar.gif" alt="" class="img-responsive">
+            <%} else {%>
+            <img src="<%= group.avatar.path %>"  alt="" class="img-responsive">
+            <% } %>
+            <% if ( group.subscribers.indexOf(user._id) == -1) {%>
+                <form action="/group/subscriber/add" method="post">
+                    <input type="text" name="user_id" class="form-control hidden" value="<%= user._id %>">
+                    <input type="text" name="group_id" class="form-control hidden" value="<%= group._id %>">
+                    <input type="submit" value="Subscribe" class="btn btn-primary">
+                </form>
+                <% } else { %>
+                <form action="/group/subscriber/remove" method="post">
+                    <input type="text" name="user_id" class="form-control hidden" value="<%= user._id %>">
+                    <input type="text" name="group_id" class="form-control hidden" value="<%= group._id %>">
+                    <input type="submit" value="Unsubscribe" class="btn btn-warning">
+                </form>
+            <% } %>
+        </div>
+        <div class="col-md-7">
+            <h3><a href="/group/id<%= group._id %>"><%= group.title %></a></h3>
+            <p><%= group.description %></p>
+        </div>
+    </div>
+    <% }) %>
+    <% } %>
+    <br>
+    <br>
+    <br>
+    </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.5/jquery.fancybox.js"></script>
+<script src="../../public/views/scripts/material.min.js"></script>
 <script>
-    $(document).ready(function() {
-        $("a#inline").fancybox();
-        console.log("asdasd");
+    $(function() {
+        $(".form-group").click(function() {
+            $(this).addClass("is-focused");
+        });
     });
 </script>
 </body>

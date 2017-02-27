@@ -11,7 +11,6 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css" />
     <link href="../public/views/style/material-kit.css" rel="stylesheet"/>
     <link rel="stylesheet" href="../public/views/style.css">
-
 </head>
 <body>
     <% include partials/header %>
@@ -19,18 +18,17 @@
         <div class="main_block">
             <br>
             <br>
-            <% if (reqUser) {%>
+            <pre>
+                <%=  JSON.stringify(userNews) %>
+            </pre>
                 <div class="col-md-4">
-            <% } else { %>
-                <div class="col-md-4">
-            <% } %>
                     <div class="card card-signup">
                         <% if (!user.avatar) {%>
                             <img src="../public/uploads/avatar/avatar.gif" alt="" class="img-responsive">
                         <%} else {%>
                             <img src="<%= user.avatar.path %>" alt="" class="img-responsive">
                         <% } %>
-                        <% if (reqUser) {%>
+                        <% if (JSON.stringify(reqUser._id) == (JSON.stringify(user._id))) {%>
                             <form action='/avatar' method='post' enctype='multipart/form-data' class="group_form" name="avatar">
                                 <input name='file' id='file' type='file' value="file" class="form-control">
                                 <input type='submit' value='Add avatar' class="btn btn-primary form-control">
@@ -41,11 +39,22 @@
                     <div class="card card-signup">
                         <div class="friends-block">
                             <h3 class="text-center">Friends</h3>
-                            <ul id="friends"></ul>
+                            <% user.friends.forEach((user)=> { %>
+                            <a href="/user/id<%= user._id %>">
+                                <div class="col-md-4">
+                                    <p class="text-center"><%= user.name %></p>
+                                    <% if (!user.avatar) { %>
+                                    <img src="../public/uploads/avatar/no-photo.png" id="avatar" alt="" class="img-rounded img-responsive img-raised">
+                                    <%} else {%>
+                                    <img src="<%= user.avatar.path %>" alt="" class="img-rounded img-responsive img-raised">
+                                    <% } %>
+                                </div>
+                            </a>
+                            <% }) %>
                         </div>
                     </div>
                     <% } else {%>
-                    <div class="card card-signup">
+                    <div class="card card-signu p">
                         <div class="friends-block">
                             <h3 class="text-center">Friends</h3>
                             <h3 class="text-center">You have no friends</h3>
@@ -57,77 +66,132 @@
                     <div class="card card-signup">
                         <h4 class="username"><%= user.name + " " + user.surname %></h4>
                         <p>Gender: <%= user.gender %> </p>
-                        <p>Birthday: <%= user.day +'/'+user.month+'/'+user.year %> </p>
+                        <% if (user.date) {%>
+                            <p>Birthday: <%= user.date %> </p>
+                        <% } %>
                     </div>
                     <div class="clearfix"></div>
-                    <% if (reqUser) {%>
                     <div class="card card-signup">
                         <ul class="user-info" id="user-info"></ul>
                     </div>
-                    <% } %>
-                    <% if (reqUser) { %>
+                    <% if (JSON.stringify(reqUser._id) == JSON.stringify(user._id)) { %>
                         <div class="card card-signup">
                             <form action="/news/new" method="post" enctype='multipart/form-data' name="news" id="newsForm">
-                                <div class="input-group">
-										<span class="input-group-addon">
-											<i class="material-icons">face</i>
-										</span>
-                                    <div class="form-group is-empty"><input type="text" class="form-control" placeholder="First Name..."></div>
+                                <div class="form-group">
+                                    <input type="text" name="title" placeholder="title" class="form-control">
                                 </div>
-                                <input type="text" name="title" placeholder="title" class="form-control">
-                                <input type="text" name="description" placeholder="description" class="form-control">
+                                <input type="text" name="type" value="News" class="hidden">
+                                <div class="form-group">
+                                    <input type="text" name="description" placeholder="description" class="form-control">
+                                </div>
                                 <input name='file' id='file' type='file' value="file" class="form-control">
-                                <div class="clearfix"></div>
                                 <input type="submit" value="Add news" class="btn btn-primary form-control">
                             </form>
                         </div>
                     <% } %>
                     <div class="clearfix"></div>
-                    <% for(var i=0; i<user.news.length; i++) {%>
-                    <div class="card card-signup">
-                        <div class="col-md-3">
-                            <% if (user.news[i].creator.avatar) {%>
-                            <img src="<%= user.news[i].creator.avatar.path %>" id="news-awatar" alt="" class="img-responsive">
-                            <% } else { %>
-                            <img src="../public/uploads/avatar/avatar.gif" id="news-awatar" alt="" class="img-responsive">
-                            <% } %>
-                        </div>
-                        <div class="col-md-9">
-                            <p class="news-creator">
-                                <%= user.news[i].creator.name %> <%= user.news[i].creator.surname %>
-                            </p>
-                            <p><%= user.news[i].title %></p>
-                            <p><%= user.news[i].description %></p>
-                            <% if (user.news[i].photo) {%>
-                                <img src="<%=user.news[i].photo.path %>" alt="" class="img-responsive">
-                            <% } %>
-                            <% if (reqUser) { %>
-                                <form action="/news/like/id<%= user.news[i]._id %>" method="post">
-                                    <input type="text" class="hidden" name="news_id" value="<%= user.news[i]._id %>">
-                                    <% if (user.news[i].likes_persons.indexOf(user._id) == -1)  {%>
-                                    <input type="submit" class="btn btn-primary" value="Like">
-                                    <% } else { %>
-                                    <input type="submit" class="btn btn-primary" value="Dislike">
-                                    <% } %>
-                                    <span class="badge"><%= user.news[i].likes_count %></span>
-                                </form>
-                                <% if (JSON.stringify(user.news[i].creator._id) != JSON.stringify(reqUser._id)) {%>
-                                    <form action="/news/repost" method="post">
-                                        <input type="text" class="hidden" name="news_id" value="<%= user.news[i]._id %>">
-                                        <input type="text" class="hidden" name="user_id" value="<%= reqUser._id %>">
-                                        <% if (user.news[i].repost_persons.indexOf(user._id) == -1)  {%>
-                                        <input type="submit" class="btn btn-primary" value="Repost">
+                    <% if (userNews.length>0) {%>
+                        <% for(var i=0; i<userNews.length; i++) {%>
+                            <% if (userNews[i].title) {%>
+                                <div class="card card-signup">
+                                    <div class="col-md-3">
+                                        <% if (userNews[i].creator.avatar) {%>
+                                        <img src="<%=userNews[i].creator.avatar.path %>" id="news-awatar" alt="" class="img-responsive">
                                         <% } else { %>
-                                        <input type="submit" class="btn btn-primary" value="Unrepost">
+                                        <img src="../public/uploads/avatar/avatar.gif" id="news-awatar" alt="" class="img-responsive">
                                         <% } %>
-                                        <span class="badge"><%= user.news[i].repost_count %></span>
-                                    </form>
-                                <% } %>
+                                    </div>
+                                    <div class="col-md-9">
+                                        <p class="news-creator">
+                                            <%= userNews[i].creator.name %> <%= userNews[i].creator.surname %>
+                                        </p>
+                                        <p><%= userNews[i].title %></p>
+                                        <p><%= userNews[i].description %></p>
+                                        <% if (userNews[i].photo) {%>
+                                        <img src="<%=userNews[i].photo.path %>" alt="" class="img-responsive">
+                                        <% } %>
+                                        <% if (reqUser) { %>
+                                            <form action="/news/like/id<%= userNews[i]._id %>" method="post">
+                                                <input type="text" class="hidden" name="news_id" value="<%= userNews[i]._id %>">
+                                                <% if (userNews[i].likes_persons.indexOf(reqUser._id) == -1)  {%>
+                                                    <input type="submit" class="btn btn-primary" value="Like">
+                                                <% } else { %>
+                                                    <input type="submit" class="btn btn-primary" value="Dislike">
+                                                <% } %>
+                                                <span class="badge"><%= userNews[i].likes_count %></span>
+                                            </form>
+                                            <% if (JSON.stringify(userNews[i].creator._id) != JSON.stringify(reqUser._id)) {%>
+                                                <form action="/news/repost" method="post">
+                                                    <input type="text" class="hidden" name="news_id" value="<%= userNews[i]._id %>">
+                                                    <input type="text" class="hidden" name="user_id" value="<%= reqUser._id %>">
+                                                    <% if (userNews[i].repost_persons.indexOf(user._id) == -1)  {%>
+                                                        <input type="submit" class="btn btn-primary" value="Repost">
+                                                    <% } else { %>
+                                                        <input type="submit" class="btn btn-primary" value="Unrepost">
+                                                    <% } %>
+                                                    <span class="badge"><%= userNews[i].repost_count %></span>
+                                                </form>
+                                            <% } else {%>
+                                                <p class="text-primary">Reposts <%= userNews[i].repost_count %></p>
+                                            <% } %>
+                                        <% } %>
+                                    </div>
+                                    <div class="clearfix"></div>
+                                </div>
+                            <% } else { %>
+                                <div class="card card-signup">
+                                    <div class="col-md-3">
+                                        <% if (userNews[i].news_id.creator.avatar) {%>
+                                        <img src="<%= userNews[i].news_id.creator.avatar.path %>" id="news-awatar" alt="" class="img-responsive">
+                                        <% } else { %>
+                                        <img src="../public/uploads/avatar/avatar.gif" id="news-awatar" alt="" class="img-responsive">
+                                        <% } %>
+                                    </div>
+                                    <div class="col-md-9">
+                                        <p class="news-creator">
+                                            <%= userNews[i].news_id.creator.name %> <%= userNews[i].news_id.creator.surname %>
+                                        </p>
+                                        <p><%= userNews[i].news_id.title %></p>
+                                        <p><%= userNews[i].news_id.description %></p>
+                                        <% if (userNews[i].news_id.photo) {%>
+                                        <img src="<%=userNews[i].news_id.photo.path %>" alt="" class="img-responsive">
+                                        <% } %>
+                                        <% if (reqUser) { %>
+                                            <form action="/news/like/id<%= userNews[i].news_id._id %>" method="post">
+                                                <input type="text" class="hidden" name="news_id" value="<%= userNews[i].news_id._id %>">
+                                                <% if (userNews[i].news_id.likes_persons.indexOf(reqUser._id) == -1)  {%>
+                                                    <input type="submit" class="btn btn-primary" value="Like">
+                                                <% } else { %>
+                                                    <input type="submit" class="btn btn-primary" value="Dislike">
+                                                <% } %>
+                                                <span class="badge"><%= userNews[i].news_id.likes_count %></span>
+                                            </form>
+                                            <% if (JSON.stringify(userNews[i].news_id.creator._id) != JSON.stringify(reqUser._id)) {%>
+                                                <form action="/news/repost" method="post">
+                                                    <input type="text" class="hidden" name="news_id" value="<%= userNews[i].news_id._id %>">
+                                                    <input type="text" class="hidden" name="user_id" value="<%= reqUser._id %>">
+                                                    <% if (userNews[i].news_id.repost_persons.indexOf(user._id) == -1)  {%>
+                                                        <input type="submit" class="btn btn-primary" value="Repost">
+                                                    <% } else { %>
+                                                        <input type="submit" class="btn btn-primary" value="Unrepost">
+                                                    <% } %>
+                                                    <span class="badge"><%= userNews[i].news_id.repost_count %></span>
+                                                </form>
+                                            <% } else {%>
+                                                <p class="text-primary">Reposts <%= userNews[i].news_id.repost_count %></p>
+                                            <% } %>
+                                        <% } %>
+                                    </div>
+                                    <div class="clearfix"></div>
+                                </div>
                             <% } %>
-
+                        <% } %>
+                    <% } else {%>
+                        <div class="card card-signup">
+                            <h3 class="text-center">
+                                User have no news
+                            </h3>
                         </div>
-                        <div class="clearfix"></div>
-                    </div>
                     <% } %>
                 </div>
                 <div class="clearfix"></div>
@@ -138,9 +202,12 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script src="../public/views/scripts/material.min.js"></script>
     <script src="../public/views/scripts/bootstrap-datepicker.js" type="text/javascript"></script>
-    $('.datepicker').datepicker({
-    weekStart:1
-    });
-
+    <script type="text/javascript">
+        $(function() {
+            $(".form-group").click(function() {
+                $(this).addClass("is-focused");
+            });
+        });
+    </script>
 </body>
 </html>

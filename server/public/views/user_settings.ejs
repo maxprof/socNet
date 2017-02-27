@@ -2,10 +2,15 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' name='viewport' />
     <title>Document</title>
-    <link rel="stylesheet" href="../public/views/style/profile.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css" />
+    <link href="../public/views/style/material-kit.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="../public/views/style.css">
 </head>
 <body>
 <% include partials/header %>
@@ -14,39 +19,23 @@
 <div class="container">
     <div class="row">
         <h1 class="text-center">User settings</h1>
-        <div class="col-md-6 col-md-offset-3">
-            <form class="form-horizontal" action='/user/settings' method='post'>
-                <fieldset>
-                    <!-- first-name input-->
-                    <div class="control-group">
-                        <div class="controls">
-                            <input id="first-name" name="name" type="text" value="<%= user.name %>"
-                                   class="input-xlarge form-control">
-                            <p class="help-block"></p>
-                        </div>
+        <div class="card card-user-settings">
+            <form action='/user/settings' method='post'>
+                <div class="form-group">
+                    <input id="first-name" name="name" type="text" value="<%= user.name %>" class="input-xlarge form-control">
+                </div>
+                <div class="form-group">
+                    <input id="last-name" name="surname" type="text" value="<%= user.surname %>" class="input-xlarge form-control">
+                </div>
+                <% if (user.date) {%>
+                    <div class="form-group">
+                        <input class="datepicker form-control" type="text" value="<%= user.date %>" name="date" id=""/>
                     </div>
-                    <!-- last-name input-->
-                    <div class="control-group">
-                        <div class="controls">
-                            <input id="last-name" name="surname" type="text" value="<%= user.surname %>"
-                                   class="input-xlarge form-control">
-                            <p class="help-block"></p>
-                        </div>
+                <% } else {%>
+                    <div class="form-group">
+                        <input class="datepicker form-control" type="text" value="" name="date" id="datePick"/>
                     </div>
-                    <div class="form-group date-fields">
-                        <div class="form-inline">
-                            <div class="form-group">
-                                <input type="text" class="form-control" placeholder="Year" value="<%= user.year %>" name="year"/>
-                            </div>
-                            <div class="form-group">
-                                <input type="text" class="form-control" placeholder="Month" value="<%= user.month %>" name="month"/>
-                            </div>
-                            <div class="form-group">
-                                <input type="text" class="form-control" placeholder="Day" value="<%= user.day %>" name="day"/>
-                            </div>
-                        </div>
-                    </div>
-                    <h1>Gender: <% user.gender %></h1>
+                <% } %>
                     <select class="form-control" name="gender">
                         <% if (!user.gender) { %>
                             <option name="gender" value="Female">Female</option>
@@ -61,13 +50,29 @@
                         <% } %>
                     </select>
                     <input type='submit' value='Update user info' class="btn btn-primary" >
-                </fieldset>
             </form>
         </div>
     </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-<script src="../public/views/scripts/profile.js"></script>
+<script src="../public/views/scripts/material.min.js"></script>
+<script src="../public/views/scripts/bootstrap-datepicker.js" type="text/javascript"></script>
+<script type="text/javascript">
+    $(function() {
+        let now = new Date();
+        let curr_date = now.getDate();
+        let curr_month = now.getMonth() + 1;
+        let curr_year = now.getFullYear();
+        let formatDate = curr_date + "/" + curr_month + "/" + curr_year
+        $('#datePick').val(formatDate);
+        $(".form-group").click(function() {
+            $(this).addClass("is-focused");
+        });
+    });
+    $('.datepicker').datepicker({
+        weekStart:1
+    });
+</script>
 </body>
 </html>

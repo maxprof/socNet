@@ -9,9 +9,9 @@ const groupSchema = new mongoose.Schema({
     title: String,
     description: String,
     date: Date,
-    posts: [{
+    news: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Post'
+        ref: 'News'
     }],
     admins: [{
         type: mongoose.Schema.Types.ObjectId,
@@ -29,10 +29,10 @@ const groupSchema = new mongoose.Schema({
 
 groupSchema.plugin(deepPopulate, {
     populate: {
-        'posts.creator': {
+        'news.creator': {
             select: 'avatar name surname'
         },
-        'posts.creator.avatar': {
+        'news.creator.avatar': {
             select: 'name path'
         },
         'admins': {
@@ -47,7 +47,7 @@ groupSchema.plugin(deepPopulate, {
         'subscribers.avatar': {
             select: 'name path'
         },
-        'posts.photo': {
+        'news.photo': {
             select: 'name path'
         }
     }

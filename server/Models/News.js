@@ -10,8 +10,6 @@ var _mongoose2 = _interopRequireDefault(_mongoose);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var deepPopulate = require('mongoose-deep-populate')(_mongoose2.default);
-
 var newsSchema = new _mongoose2.default.Schema({
     title: String,
     description: String,
@@ -29,6 +27,11 @@ var newsSchema = new _mongoose2.default.Schema({
         type: _mongoose2.default.Schema.Types.ObjectId,
         ref: 'User'
     }],
+    type: String,
+    group_id: {
+        type: _mongoose2.default.Schema.Types.ObjectId,
+        ref: 'Group'
+    },
     repost_count: { type: Number, default: 0 },
     repost_persons: [{
         type: _mongoose2.default.Schema.Types.ObjectId,

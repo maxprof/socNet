@@ -65,20 +65,26 @@ module.exports = {
     profileInspection: function profileInspection(req, res, next) {
         var token = req.cookies.token;
         var paramsId = req.params.id;
-        if (token) {
-            _jsonwebtoken2.default.verify(token, _secrets2.default.sessionSecret, function (err, decoded) {
-                if (err) return res.status(501).send("Bad token");
-                _User2.default.findById(decoded.data).exec(function (err, user) {
-                    if (err) return res.status(501).send('/user/login');
-                    if (user) {
-                        if (user._id == paramsId) req.reqUser = user;
-                        req.user = user;
-                        return next();
-                    }
+        if (!token) return next();
+        _jsonwebtoken2.default.verify(token, _secrets2.default.sessionSecret, function (err, decoded) {
+            if (err) return res.status(501).send("Bad token");
+            _User2.default.findById(decoded.data).exec(function (err, user) {
+                if (err) return res.status(501).send('/user/login');
+                if (!user) return next();
+                if (JSON.stringify(user._id) == paramsId) {
+                    req.reqUser = user;
+                    req.user = user;
                     return next();
-                });
+                } else {
+                    _User2.default.findById(paramsId).exec(function (err, reqUser) {
+                        if (err) console.log(err.message);
+                        req.reqUser = user;
+                        req.user = reqUser;
+                        return next();
+                    });
+                }
             });
-        } else next();
+        });
     },
     newError: function newError(msg, status, done) {
         var error = {
@@ -117,16 +123,18 @@ module.exports = {
                 email: _joi2.default.string().email().required(),
                 password: _joi2.default.string().regex(/^[a-zA-Z0-9]{3,30}$/)
             });
-        } else if (type == 'group_create' || type == 'news') {
-            var schema = _joi2.default.object().keys({
-                title: _joi2.default.string().min(3).max(30).required(),
-                description: _joi2.default.string().min(3).max(2000).required()
-            });
-        } else if (type == 'group' || type == 'post') {
+        } else if (type == 'group_create' || type == 'News') {
             var schema = _joi2.default.object().keys({
                 title: _joi2.default.string().min(3).max(30).required(),
                 description: _joi2.default.string().min(3).max(2000).required(),
-                group_id: _joi2.default.string().required()
+                type: _joi2.default.string()
+            });
+        } else if (type == 'group' || type == 'Post') {
+            var schema = _joi2.default.object().keys({
+                title: _joi2.default.string().min(3).max(100).required(),
+                description: _joi2.default.string().min(3).max(2000).required(),
+                group_id: _joi2.default.string().required(),
+                type: _joi2.default.string()
             });
         }
         _joi2.default.validate(obj, schema, function (err) {

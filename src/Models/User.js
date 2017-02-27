@@ -15,9 +15,6 @@ const userSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Message'
     }],
-    day: String,
-    month: String,
-    year: String,
     friendsRequests: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
@@ -49,7 +46,7 @@ const userSchema = new mongoose.Schema({
     }],
     news_reposts: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'News'
+        ref: 'NewsReposts'
     }],
     subscribers: [{
         type: mongoose.Schema.Types.ObjectId,
@@ -58,7 +55,8 @@ const userSchema = new mongoose.Schema({
     posts: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Post'
-    }]
+    }],
+    date : String
 });
 
 userSchema.methods.generateHash = pass => bcrypt.hashSync(pass, bcrypt.genSaltSync(8), null);
@@ -81,6 +79,24 @@ userSchema.plugin(deepPopulate, {
             select: 'name surname path'
         },
         'friends.avatar': {
+            select: 'name path'
+        },
+        'news_reposts.user_id': {
+            select: 'name surname avatar'
+        },
+        'news_reposts.user_id.avatar': {
+            select: 'path'
+        },
+        'news_reposts.news_id': {
+            select: 'title description date creator photo repost_count likes_count likes_persons repost_persons'
+        },
+        'news_reposts.news_id.photo': {
+            select: 'path'
+        },
+        'news_reposts.news_id.creator': {
+            select: 'name surname avatar'
+        },
+        'news_reposts.news_id.creator.avatar': {
             select: 'name path'
         },
         'subscribers':{

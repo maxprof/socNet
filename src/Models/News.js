@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-const deepPopulate = require('mongoose-deep-populate')(mongoose);
 
 const newsSchema = new mongoose.Schema({
     title: String,
@@ -20,6 +19,11 @@ const newsSchema = new mongoose.Schema({
             ref: 'User'
         }
     ],
+    type: String,
+    group_id: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Group'
+    },
     repost_count: {type: Number, default: 0},
     repost_persons:  [
             {

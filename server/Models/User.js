@@ -29,9 +29,6 @@ var userSchema = new _mongoose2.default.Schema({
         type: _mongoose2.default.Schema.Types.ObjectId,
         ref: 'Message'
     }],
-    day: String,
-    month: String,
-    year: String,
     friendsRequests: [{
         type: _mongoose2.default.Schema.Types.ObjectId,
         ref: 'User'
@@ -63,7 +60,7 @@ var userSchema = new _mongoose2.default.Schema({
     }],
     news_reposts: [{
         type: _mongoose2.default.Schema.Types.ObjectId,
-        ref: 'News'
+        ref: 'NewsReposts'
     }],
     subscribers: [{
         type: _mongoose2.default.Schema.Types.ObjectId,
@@ -72,7 +69,8 @@ var userSchema = new _mongoose2.default.Schema({
     posts: [{
         type: _mongoose2.default.Schema.Types.ObjectId,
         ref: 'Post'
-    }]
+    }],
+    date: String
 });
 
 userSchema.methods.generateHash = function (pass) {
@@ -97,6 +95,24 @@ userSchema.plugin(deepPopulate, {
             select: 'name surname path'
         },
         'friends.avatar': {
+            select: 'name path'
+        },
+        'news_reposts.user_id': {
+            select: 'name surname avatar'
+        },
+        'news_reposts.user_id.avatar': {
+            select: 'path'
+        },
+        'news_reposts.news_id': {
+            select: 'title description date creator photo repost_count likes_count likes_persons repost_persons'
+        },
+        'news_reposts.news_id.photo': {
+            select: 'path'
+        },
+        'news_reposts.news_id.creator': {
+            select: 'name surname avatar'
+        },
+        'news_reposts.news_id.creator.avatar': {
             select: 'name path'
         },
         'subscribers': {
