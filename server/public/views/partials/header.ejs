@@ -5,15 +5,15 @@
                 <span class="sr-only">Toggle navigation</span>
                 <i class="icon-menu"></i> Menu
             </button>
-            <% if (user) {%>
-                <a class="navbar-brand" href="/user/id<%= user._id %>">SocNet</a>
+            <% if (reqUser) {%>
+                <a class="navbar-brand" href="/user/id<%= reqUser._id %>">SocNet</a>
             <% } else { %>
                 <a class="navbar-brand" href="/user/login">SocNet</a>
             <% } %>
         </div>
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav navbar-right">
-                <% if (user) { %>
+                <% if (reqUser) { %>
                     <li>
                         <a href="/user/messagess">
                             Messagess

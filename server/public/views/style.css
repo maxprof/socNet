@@ -111,7 +111,7 @@ ul#news li{
 .panel-body
 {
     overflow-y: scroll;
-    height: 80vh;
+    height: 80.4vh;
 }
 
 ::-webkit-scrollbar-track
@@ -279,4 +279,7 @@ div#cap {
     color: #fbc02d;
     font-weight: bold;
     font-size: 15px;
+}
+img.img-responsive {
+    width: 100%;
 }

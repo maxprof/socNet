@@ -24,7 +24,7 @@
                 <hr>
                 <p><%= group.description %></p>
                 <% group.admins.forEach((admin) => {  %>
-                    <% if (user && ((admin._id == user._id) || (JSON.stringify(group.creator._id) == JSON.stringify(user._id)))) {%>
+                    <% if (reqUser && ((admin._id == reqUser._id) || (JSON.stringify(group.creator._id) == JSON.stringify(reqUser._id)))) {%>
                         <a id="inline" href="#" class="btn btn-primary"  data-toggle="modal" data-target="#myModal2">Edit</a>
                     <% } %>
                 <% }) %>
@@ -53,7 +53,7 @@
                 </div>
             </div>
             <% group.admins.forEach((admin) => {  %>
-                <% if (user && ((admin._id == user._id) || (JSON.stringify(group.creator._id) == JSON.stringify(user._id)))) {%>
+                <% if (reqUser && ((admin._id == reqUser._id) || (JSON.stringify(group.creator._id) == JSON.stringify(reqUser._id)))) {%>
                     <div class="card card-signup">
                         <form action="/post/new" method="post" enctype='multipart/form-data' id="addNewPost">
                             <input type="text" name="type" value="Post" class="hidden">
@@ -81,15 +81,25 @@
                     <% if (item.photo) {%>
                         <img src="<%= item.photo.path %>" alt="" class="img-responsive">
                     <% } %>
-                    <% if (user) {%>
+                    <% if (reqUser) {%>
                         <form action="/post/like/id<%= item._id %>" method="post">
                             <input type="text" class="hidden" name="news_id" value="<%= item._id %>">
-                            <% if (item.likes_persons.indexOf(user._id) == -1)  {%>
+                            <% if (item.likes_persons.indexOf(reqUser._id) == -1)  {%>
                                 <input type="submit" class="btn btn-primary" value="Like">
                             <% } else { %>
                                 <input type="submit" class="btn btn-primary" value="Dislike">
                             <% } %>
                             <span class="badge"><%= item.likes_count %></span>
+                        </form>
+                        <form action="/news/repost" method="post">
+                            <input type="text" class="hidden" name="news_id" value="<%= item._id %>">
+                            <input type="text" class="hidden" name="user_id" value="<%= reqUser._id %>">
+                            <% if (item.repost_persons.indexOf(reqUser._id) == -1)  {%>
+                                <input type="submit" class="btn btn-primary" value="Repost">
+                            <% } else { %>
+                                <input type="submit" class="btn btn-primary" value="Unrepost">
+                            <% } %>
+                            <span class="badge"><%= item.repost_count %></span>
                         </form>
                     <% } %>
                 </div>
@@ -103,7 +113,7 @@
                     <img src="<%= group.avatar.path %>" alt="" class="img-responsive messageAvatar">
                 <% } %>
                 <% group.admins.forEach((admin) => {  %>
-                    <% if (user && ((admin._id == user._id) || (JSON.stringify(group.creator._id) == JSON.stringify(user._id)))) {%>
+                    <% if (reqUser && ((admin._id == reqUser._id) || (JSON.stringify(group.creator._id) == JSON.stringify(reqUser._id)))) {%>
                         <form action='/group/avatar' method='post' class="group_form" enctype='multipart/form-data'>
                             <div class="hidden">
                                 <input name='group_id' id='group_id' type='text' value="<%= group._id %>">
@@ -123,8 +133,8 @@
                 <div class="card-block">
                     <% if (group.subscribers) { %>
                         <% group.subscribers.forEach((subscriber)=> { %>
-                            <% if (user) {%>
-                                <% if (JSON.stringify(subscriber._id) != JSON.stringify(user._id)) {%>
+                            <% if (reqUser) {%>
+                                <% if (JSON.stringify(subscriber._id) != JSON.stringify(reqUser._id)) {%>
                                     <a href="/user/id<%= subscriber._id %>">
                                         <div class="col-md-4 subscriber">
                                             <p class="text-center"><%= subscriber.name %></p>

@@ -163,13 +163,15 @@ module.exports = {
         });
     },
     settings: function settings(req, res) {
+        console.log(req.reqUser);
+        console.log(req.user);
         res.render('user_settings.ejs', {
-            user: req.user
+            user: req.user,
+            reqUser: req.reqUser ? req.reqUser : null
         });
     },
-    settingsPost: function settingsPost(req, res) {
+    settingsPost: function settingsPost(req, res, next) {
         var body = req.body;
-        console.log(body);
         req.user.set(body);
         req.user.save(function (err) {
             if (err) return _helpers2.default.newError(err.msg, 500, function (error) {
@@ -280,7 +282,7 @@ module.exports = {
             group.deepPopulate('news.creator admins.avatar admins subscribers subscribers.avatar news.creator.avatar news.photo', function (err, group) {
                 res.render('group_page.ejs', {
                     group: group ? group : null,
-                    user: req.reqUser ? req.reqUser : null
+                    reqUser: req.reqUser ? req.reqUser : null
                 });
             });
         });
@@ -296,7 +298,8 @@ module.exports = {
             });
             res.render('myGroups.ejs', {
                 groups: groups ? groups : null,
-                user: req.user ? req.user : null
+                user: req.user ? req.user : null,
+                reqUser: req.reqUser ? req.reqUser : null
             });
         });
     },
@@ -310,7 +313,8 @@ module.exports = {
             });
             res.render('allGroups.ejs', {
                 groups: groups ? groups : null,
-                user: req.user ? req.user : null
+                user: req.user ? req.user : null,
+                reqUser: req.reqUser ? req.reqUser : null
             });
         });
     },
@@ -322,7 +326,8 @@ module.exports = {
             });
             res.render('adminGroups.ejs', {
                 groups: groups ? groups : null,
-                user: req.user ? req.user : null
+                user: req.user ? req.user : null,
+                reqUser: req.reqUser ? req.reqUser : null
             });
         });
     },
@@ -796,7 +801,8 @@ module.exports = {
                     return next(error);
                 });
                 res.render('dialogs.ejs', {
-                    user: user ? user : null
+                    user: user ? user : null,
+                    reqUser: req.reqUser ? req.reqUser : null
                 });
             });
         });

@@ -53,6 +53,7 @@ module.exports = {
                     if (err) return res.status(501).send('/user/login');
                     if (user) {
                         req.user = user;
+                        req.reqUser = user;
                         return next();
                     }
                     return res.status(404).send('/user/login');

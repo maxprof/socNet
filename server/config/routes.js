@@ -33,6 +33,7 @@ module.exports = function (app) {
     app.delete('/news/delete/id:id', main_controller.deleteNews);
     app.post('/news/like/id:id', helpers.tokenInspection, main_controller.newsLike);
     app.post('/news/repost', helpers.tokenInspection, main_controller.repostNews);
+    app.post('/post/repost', helpers.tokenInspection, main_controller.repostPost);
 
     app.get('/group/id:id', helpers.profileInspection, main_controller.getGroup);
     app.get('/user/groups', helpers.tokenInspection, main_controller.getMyGroups);

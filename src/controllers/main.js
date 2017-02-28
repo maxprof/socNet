@@ -113,13 +113,15 @@ module.exports = {
             })
     },
     settings: (req, res) => {
+        console.log(req.reqUser);
+        console.log(req.user);
         res.render('user_settings.ejs', {
-            user: req.user
+            user: req.user,
+            reqUser: req.reqUser ? req.reqUser : null
         });
     },
-    settingsPost: (req, res) => {
+    settingsPost: (req, res, next) => {
         let body = req.body;
-        console.log(body);
         req.user.set(body);
         req.user.save((err)=>{ if (err) return helpers.newError(err.msg, 500, (error) => { return next(error) }); });
         res.status(200).redirect('/user/settings');
@@ -209,7 +211,7 @@ module.exports = {
                 group.deepPopulate('news.creator admins.avatar admins subscribers subscribers.avatar news.creator.avatar news.photo', (err, group) => {
                     res.render('group_page.ejs', {
                         group: group ? group : null,
-                        user: req.reqUser ? req.reqUser : null
+                        reqUser: req.reqUser ? req.reqUser : null
                     });
                 });
             })
@@ -224,7 +226,8 @@ module.exports = {
                 if (!groups) return helpers.newError("Group not found", 404, (error) => { return next(error); });
                 res.render('myGroups.ejs', {
                     groups: groups ? groups : null,
-                    user: req.user ? req.user : null
+                    user: req.user ? req.user : null,
+                    reqUser: req.reqUser ? req.reqUser : null
                 });
             })
     },
@@ -237,7 +240,8 @@ module.exports = {
                 if (!groups) return helpers.newError("Groups not found", 404, (error) => { return next(error); });
                 res.render('allGroups.ejs', {
                     groups: groups ? groups : null,
-                    user: req.user ? req.user : null
+                    user: req.user ? req.user : null,
+                    reqUser: req.reqUser ? req.reqUser : null
                 });
             })
     },
@@ -250,7 +254,8 @@ module.exports = {
                 if (err) return helpers.newError(err.msg, 404, (error) => { return next(error) });
                 res.render('adminGroups.ejs', {
                     groups: groups ? groups : null,
-                    user: req.user ? req.user : null
+                    user: req.user ? req.user : null,
+                    reqUser: req.reqUser ? req.reqUser : null
                 });
             })
     },
@@ -639,7 +644,8 @@ module.exports = {
                 user.deepPopulate('friends.avatar', (err, user) => {
                     if (err)  helpers.newError(err.msg, 500, (error) => { return next(error) });
                     res.render('dialogs.ejs', {
-                        user: user ? user : null
+                        user: user ? user : null,
+                        reqUser: req.reqUser ? req.reqUser : null
                     });
                 });
             })
