@@ -133,7 +133,7 @@ module.exports = {
         });
     },
     addPhotos: (req, res, next) => {
-        fileUpload.fileUpload(req, 'avatar', (err, msg) => {
+        fileUpload.fileUpload(req, 'user_photos', (err, msg) => {
             if (err) return helpers.newError(err.msg, 500, (error) => { return next(error) });
             return res.status(200).redirect('back');
         });

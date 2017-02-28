@@ -4,7 +4,7 @@ import fs from 'fs';
 const upload = require('../Modules/upload');
 
 export function fileUpload(req, type, done) {
-    console.log(req.files);
+    console.log(req.files.uploadedFiles);
 
     // const file_name =  randomstring.generate(6) + new Date().getTime() + req.files.file.name;
     // const shortPath = `/../public/uploads/${type}/${file_name}`;

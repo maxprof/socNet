@@ -71,7 +71,7 @@
                     <div class="card card-signup">
                         <% if (JSON.stringify(reqUser._id) == (JSON.stringify(user._id))) {%>
                         <form action='/user/photos' method='post'  enctype='multipart/form-data' class="group_form" name="photos">
-                            <input name='uploadedFiles' id='file' type='file' value="file" class="form-control" multiple="multiple">
+                            <input name='uploadedFiles' id='file' type='file' class="form-control" accept="image/*" multiple="multiple">
                             <input type='submit' value='Add photos' class="btn btn-primary form-control">
                         </form>
                         <%}%>
