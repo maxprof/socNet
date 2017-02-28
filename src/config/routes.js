@@ -26,13 +26,12 @@ module.exports = app => {
     app.get('/user/settings', helpers.tokenInspection, main_controller.settings);
     app.post('/user/settings', helpers.tokenInspection, main_controller.settingsPost);
     app.post('/avatar', helpers.tokenInspection, main_controller.avatar);
+    app.post('/user/photos', helpers.tokenInspection, main_controller.addPhotos);
     app.post('/news/new', helpers.tokenInspection, main_controller.newsNewPost);
     app.post('/news/edit/id:id', main_controller.editNewsPost);
     app.delete('/news/delete/id:id', main_controller.deleteNews);
     app.post('/news/like/id:id', helpers.tokenInspection, main_controller.newsLike);
     app.post('/news/repost',  helpers.tokenInspection, main_controller.repostNews);
-    app.post('/post/repost',  helpers.tokenInspection, main_controller.repostPost);
-
 
     app.get('/group/id:id',  helpers.profileInspection, main_controller.getGroup);
     app.get('/user/groups', helpers.tokenInspection, main_controller.getMyGroups);

@@ -180,8 +180,19 @@ module.exports = {
         });
         res.status(200).redirect('/user/settings');
     },
-    avatar: function avatar(req, res) {
+    avatar: function avatar(req, res, next) {
         fileUpload.fileUpload(req, 'avatar', function (err, msg) {
+            if (err) return _helpers2.default.newError(err.msg, 500, function (error) {
+                return next(error);
+            });
+            return res.status(200).redirect('back');
+        });
+    },
+    addPhotos: function addPhotos(req, res, next) {
+        fileUpload.fileUpload(req, 'avatar', function (err, msg) {
+            if (err) return _helpers2.default.newError(err.msg, 500, function (error) {
+                return next(error);
+            });
             return res.status(200).redirect('back');
         });
     },

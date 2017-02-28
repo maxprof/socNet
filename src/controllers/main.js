@@ -126,8 +126,15 @@ module.exports = {
         req.user.save((err)=>{ if (err) return helpers.newError(err.msg, 500, (error) => { return next(error) }); });
         res.status(200).redirect('/user/settings');
     },
-    avatar: (req, res) => {
+    avatar: (req, res, next) => {
         fileUpload.fileUpload(req, 'avatar', (err, msg) => {
+            if (err) return helpers.newError(err.msg, 500, (error) => { return next(error) });
+            return res.status(200).redirect('back');
+        });
+    },
+    addPhotos: (req, res, next) => {
+        fileUpload.fileUpload(req, 'avatar', (err, msg) => {
+            if (err) return helpers.newError(err.msg, 500, (error) => { return next(error) });
             return res.status(200).redirect('back');
         });
     },
