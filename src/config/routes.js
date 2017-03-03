@@ -3,6 +3,7 @@ module.exports = app => {
     let async = require('async');
     let main_controller = require('../controllers/main.js');
     let helpers = require('../config/helpers.js');
+
     app.all('*', function(req, res, next) {
         res.header("Access-Control-Allow-Origin", "*");
         res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
@@ -20,7 +21,6 @@ module.exports = app => {
     app.post('/user/login', main_controller.Postlogin);
     app.get('/logout', main_controller.logout);
     app.get('/users', helpers.tokenInspection, main_controller.users);
-
     app.get('/sess', helpers.tokenInspection, main_controller.sess);
     app.get('/user/id:id',helpers.profileInspection, main_controller.userProfile);
     app.get('/user/settings', helpers.tokenInspection, main_controller.settings);

@@ -41,6 +41,10 @@ var userSchema = new _mongoose2.default.Schema({
         type: _mongoose2.default.Schema.Types.ObjectId,
         ref: 'File'
     },
+    photos: [{
+        type: _mongoose2.default.Schema.Types.ObjectId,
+        ref: 'File'
+    }],
     groups: [{
         type: _mongoose2.default.Schema.Types.ObjectId,
         ref: 'Group'

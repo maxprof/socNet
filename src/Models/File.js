@@ -5,6 +5,7 @@ const avatarSchema = new mongoose.Schema({
     original_name: String,
     name: String,
     size: Number,
-    path: String
+    path: String,
+    ext: String
 });
 export default mongoose.model('File', avatarSchema);

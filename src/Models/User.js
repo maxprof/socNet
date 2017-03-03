@@ -27,6 +27,12 @@ const userSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'File'
     },
+    photos: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'File'
+        }
+    ],
     groups: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Group'

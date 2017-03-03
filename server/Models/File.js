@@ -16,6 +16,7 @@ var avatarSchema = new _mongoose2.default.Schema({
     original_name: String,
     name: String,
     size: Number,
-    path: String
+    path: String,
+    ext: String
 });
 exports.default = _mongoose2.default.model('File', avatarSchema);
