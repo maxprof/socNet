@@ -109,6 +109,10 @@
                 }
             })
         });
+        socket.on('notification', function(msg){
+            console.log("Calling");
+            console.log(msg);
+        });
         socket.on('showChat', () => {
             console.log("Show chat")
             showChat();

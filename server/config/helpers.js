@@ -170,7 +170,6 @@ module.exports = {
                     message.deepPopulate('author.avatar', function (err, message) {
                         test.push(message);
                         if (messages.length - 1 == i) {
-                            console.log("test.length", test.length);
                             return done(null, test);
                         }
                     });
@@ -180,43 +179,34 @@ module.exports = {
         });
     },
     sendMessage: function sendMessage(message, user, socketRoom, done) {
-        console.log((0, _moment2.default)().format('MM/DD/YYYY'));
         _Room2.default.findOne({ _id: socketRoom }).exec(function (err, room) {
-            if (room) {
-                var newMsg = new _Messages2.default({
-                    message: message,
-                    author: user,
-                    room: socketRoom,
-                    date: (0, _moment2.default)().format('MM/DD/YYYY,h::mm:ss')
-                });
-                newMsg.save(function (err, msg) {
-                    if (err) return console.log(err.message);
-                    _async2.default.waterfall([function (done) {
-                        console.log("calling save message in room");
-                        room.update({ $addToSet: { messages: msg._id } }, function (err) {
-                            if (err) return done(err);
-                            room.save();
-                            done(null, msg);
-                        });
-                    }, function (msg, done) {
-                        console.log("calling save message in user");
-                        _User2.default.findById(user).exec(function (err, user) {
-                            if (err) done(err);
-                            user.messages.push(msg._id);
-                            user.save();
-                            console.log("Save calling?");
-
-                            done(null, "user updated");
-                        });
-                    }], function (err, result) {
-                        console.log("calling end");
-                        if (err) done(err);
-                        if (done) done(null, room.users);else done(null, "error");
+            if (!room) return console.log("Room mot found");
+            var newMsg = new _Messages2.default({
+                message: message,
+                author: user,
+                room: socketRoom,
+                date: (0, _moment2.default)().format('MM/DD/YYYY,h::mm:ss')
+            });
+            newMsg.save(function (err, msg) {
+                if (err) return console.log(err.message);
+                _async2.default.waterfall([function (done) {
+                    room.update({ $addToSet: { messages: msg._id } }, function (err) {
+                        if (err) return done(err);
+                        room.save();
+                        done(null, msg);
                     });
+                }, function (msg, done) {
+                    _User2.default.findById(user).exec(function (err, user) {
+                        if (err) done(err);
+                        user.messages.push(msg._id);
+                        user.save();
+                        done(null, "user updated");
+                    });
+                }], function (err, result) {
+                    if (err) done(err);
+                    if (done) done(null, room.users);else done(null, "error");
                 });
-            } else {
-                console.log("Room mot found");
-            }
+            });
         });
     }
 };

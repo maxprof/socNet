@@ -130,7 +130,7 @@ module.exports = {
             .find()
             .exec(function(err)
             {
-                if (err)  return next(err);
+                if (err) return next(err);
                 let newRoom = new Room({
                     users: users,
                     private: true
@@ -155,7 +155,6 @@ module.exports = {
                         message.deepPopulate('author.avatar', (err, message) => {
                             test.push(message);
                             if (messages.length-1 == i) {
-                                console.log("test.length",test.length);
                                 return done(null, test);
                             }
                         });
@@ -166,52 +165,43 @@ module.exports = {
             })
     },
     sendMessage: (message, user, socketRoom,  done) => {
-        console.log(moment().format('MM/DD/YYYY'));
         Room
             .findOne({_id:socketRoom})
             .exec(function(err,room)
             {
-                if (room){
-                    let newMsg = new Messages({
-                        message: message,
-                        author: user,
-                        room: socketRoom,
-                        date: moment().format('MM/DD/YYYY,h::mm:ss')
-                    });
-                    newMsg.save(function(err, msg){
-                        if (err) return console.log(err.message);
-                        async.waterfall([
-                                function(done){
-                                    console.log("calling save message in room");
-                                    room.update({$addToSet: {messages: msg._id}}, function(err){
-                                        if (err) return done(err);
-                                        room.save();
-                                        done(null, msg);
+                if (!room)  return console.log("Room mot found");
+                let newMsg = new Messages({
+                    message: message,
+                    author: user,
+                    room: socketRoom,
+                    date: moment().format('MM/DD/YYYY,h::mm:ss')
+                });
+                newMsg.save(function(err, msg){
+                    if (err) return console.log(err.message);
+                    async.waterfall([
+                            function(done){
+                                room.update({$addToSet: {messages: msg._id}}, function(err){
+                                    if (err) return done(err);
+                                    room.save();
+                                    done(null, msg);
+                                });
+                            }, function(msg, done){
+                                User
+                                    .findById(user)
+                                    .exec(function(err, user){
+                                        if (err) done(err);
+                                        user.messages.push(msg._id);
+                                        user.save();
+                                        done(null, "user updated");
                                     });
-                                }, function(msg, done){
-                                    console.log("calling save message in user");
-                                    User
-                                        .findById(user)
-                                        .exec(function(err, user){
-                                            if (err) done(err);
-                                            user.messages.push(msg._id);
-                                            user.save();
-                                            console.log("Save calling?");
-
-                                            done(null, "user updated");
-                                        });
-                                }
-                            ],
-                            function(err, result){
-                                console.log("calling end");
-                                if (err) done(err);
-                                if (done) done(null, room.users);
-                                else done(null, "error")
-                            })
-                    });
-                } else {
-                    console.log("Room mot found");
-                }
+                            }
+                        ],
+                        function(err, result){
+                            if (err) done(err);
+                            if (done) done(null, room.users);
+                            else done(null, "error")
+                        })
+                });
             });
     }
 };

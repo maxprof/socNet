@@ -5,7 +5,6 @@ import busboy from 'busboy-body-parser';
 import path from 'path';
 import Room from './Models/Room';
 import Users from './Models/User';
-
 let app = express();
 let logger = require('morgan');
 let vLogger = require('log4js').getLogger();
@@ -41,6 +40,8 @@ console.log('Server running');
 io.sockets
     .on('connection', (socket) => {
         socket.on("sendUser", (user)=>{
+            socket.join(user);
+            socket.user_id = user;
             socket.reqUser = user;
         });
         socket.on('switchRoom', (usersIDs) => {
@@ -86,8 +87,37 @@ io.sockets
                     .populate('avatar')
                     .exec((err, user) => {
                         if (err) return console.log(err.message);
-                        let userNmae = user.name+ ' ' + user.surname;
-                        io.to(socket.room).emit('updatechat', userNmae, user, message);
+                        let userName = user.name+ ' ' + user.surname;
+                        io.to(socket.room).emit('updatechat', userName, user, message);
+                        let Getters = data.splice(data.indexOf(user._id.toString()), 1);
+                        let roomSockets =  socket.adapter.rooms[socket.room];
+                        if (roomSockets.length == 1) {
+                            console.log("Calling");
+                            console.log("data[0]", data[0]);
+                            io.to(data[0]).emit('notification', 'User ' + user.email + ' send message for you');
+                        } else {
+                            let socketsInRoom = Object.keys(socket.adapter.rooms[socket.room].sockets);
+                            let usersInRoom = [];
+                            socketsInRoom.forEach(function(item){
+                                if (item != socket.id){
+                                    let obj = {
+                                        user_id: io.sockets.connected[item].user_id,
+                                        user_email: io.sockets.connected[item].user_email
+                                    };
+                                    if (data.indexOf(obj.user_id) != -1){
+                                        data.splice(data.indexOf(obj.user_id), 1);
+                                        data.forEach(function(item){
+                                            Users
+                                                .findById(item)
+                                                .exec(function(err, user){
+                                                    io.to(user._id).emit('notification', 'User ' + user.email + ' send message for you');
+                                                })
+                                        });
+                                    }
+                                }
+                            });
+                        }
+
                     })
             });
         });

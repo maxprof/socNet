@@ -62,6 +62,8 @@ server.listen(app.get('port'));
 console.log('Server running');
 io.sockets.on('connection', function (socket) {
     socket.on("sendUser", function (user) {
+        socket.join(user);
+        socket.user_id = user;
         socket.reqUser = user;
     });
     socket.on('switchRoom', function (usersIDs) {
@@ -99,8 +101,34 @@ io.sockets.on('connection', function (socket) {
             if (err) return console.log(err.message);
             _User2.default.findById(socket.reqUser).populate('avatar').exec(function (err, user) {
                 if (err) return console.log(err.message);
-                var userNmae = user.name + ' ' + user.surname;
-                io.to(socket.room).emit('updatechat', userNmae, user, message);
+                var userName = user.name + ' ' + user.surname;
+                io.to(socket.room).emit('updatechat', userName, user, message);
+                var Getters = data.splice(data.indexOf(user._id.toString()), 1);
+                var roomSockets = socket.adapter.rooms[socket.room];
+                if (roomSockets.length == 1) {
+                    console.log("Calling");
+                    console.log("data[0]", data[0]);
+                    io.to(data[0]).emit('notification', 'User ' + user.email + ' send message for you');
+                } else {
+                    var socketsInRoom = Object.keys(socket.adapter.rooms[socket.room].sockets);
+                    var usersInRoom = [];
+                    socketsInRoom.forEach(function (item) {
+                        if (item != socket.id) {
+                            var obj = {
+                                user_id: io.sockets.connected[item].user_id,
+                                user_email: io.sockets.connected[item].user_email
+                            };
+                            if (data.indexOf(obj.user_id) != -1) {
+                                data.splice(data.indexOf(obj.user_id), 1);
+                                data.forEach(function (item) {
+                                    _User2.default.findById(item).exec(function (err, user) {
+                                        io.to(user._id).emit('notification', 'User ' + user.email + ' send message for you');
+                                    });
+                                });
+                            }
+                        }
+                    });
+                }
             });
         });
     });
