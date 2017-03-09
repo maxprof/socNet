@@ -9,6 +9,9 @@
     "watch": "babel src/ -d server/ --presets es2015 -w",
     "start": "cd server && node app.js"
   },
+  "engines": {
+    "node": "7.7.1"
+  },
   "author": "",
   "license": "ISC",
   "dependencies": {
