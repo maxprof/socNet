@@ -27,7 +27,7 @@
                         <% } %>
                         <% if (JSON.stringify(reqUser._id) == (JSON.stringify(user._id))) {%>
                             <form action='/avatar' method='post' enctype='multipart/form-data' class="group_form" name="avatar">
-                                <input name='avatar' id='file' type='file' value="file" class="form-control">
+                                <input name='file' id='file' type='file' value="file" class="form-control">
                                 <input type='submit' value='Add avatar' class="btn btn-primary form-control">
                             </form>
                         <%}%>

@@ -16,60 +16,8 @@ const _ = require('lodash');
 const path = require('path');
 const config = require('../config/secrets');
 
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, '.public/uploads');
-        // if (!req.user) return cb(new Error('No permission.'));
-        // let fullPath = path.join(config.files, file.fieldname);
-        // file.fullPath = fullPath;
-        // cb(null, path);
-    },
-    filename: async (req, file, cb) => {
-        cb(null, Date.now()+ file.originalname);
-        // let ext =  path.extname(file.originalname);
-        // let basename = path.basename(file.originalname, ext);
-        // let fileName = basename + '-' + Date.now() + ext;
-        // let newFile = new File();
-        // console.log("fileName", fileName);
-        // newFile.container = file.fieldname;
-        // newFile.original_name = file.originalname;
-        // newFile.name = fileName;
-        // newFile.ext = ext;
-        // newFile.path = file.path;
-        // newFile.creator = req.user._id;
-        // newFile.size = file.size;
-        // let savedFile = await newFile.save();
-        // if (!savedFile) return cb(new Error('File saving error.'));
-        // cb(null, fileName);
-    }
-});
-const uploadOne = multer({storage: storage}).single('avatar');
-const uploadMulti = multer({storage: storage}).array('photos', 2);
-
-// exports.avatarUpload = (req, res, next) => {
-//     uploadOne(req, res, (err) => {
-//         if (err) return next(err);
-//         res.json({success: true, msg: 'Uploaded successfully.'})
-//     })
-// };
-//
-// exports.multiUpload = (req, res, next) => {
-//     uploadMulti(req, res, (err) => {
-//         if (err) return next(err);
-//         res.json({success: true, msg: 'Uploaded successfully.'})
-//     })
-// };
-
 
 module.exports = {
-    addPhotos: (req, res, next) => {
-        console.log(req.files);
-        uploadMulti(req, res, (err) => {
-            if (err) console.log("err", err);
-            console.log(req.files);
-            return res.status(200).redirect('back');
-        });
-    },
     home: (req, res) => {
         res.render('index.ejs', {
             user: req.user ? req.user : null
@@ -183,7 +131,7 @@ module.exports = {
         res.status(200).redirect('/user/settings');
     },
     avatar: (req, res, next) => {
-        fileUpload.fileUpload(req, 'avatar', (err, msg) => {
+        fileUpload.fileUpload(req, 'avatar', (err) => {
             if (err) return helpers.newError(err.msg, 500, (error) => { return next(error) });
             return res.status(200).redirect('back');
         });
