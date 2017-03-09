@@ -11,6 +11,10 @@ var messageSchema = new mongoose.Schema({
     }],
     getter: String,
     room: String,
+    status: {
+        type: Boolean,
+        default: false
+    },
     date: String
 });
 

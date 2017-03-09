@@ -283,3 +283,12 @@ div#cap {
 img.img-responsive {
     width: 100%;
 }
+a.sing-up-href {
+    color: #2c0c31;
+    transition: 1s;
+}
+a.sing-up-href:hover{
+    color: #fff;
+    transition: 1s;
+    text-decoration: none;
+}

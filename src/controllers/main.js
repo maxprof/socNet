@@ -125,7 +125,7 @@ module.exports = {
     logout: (req, res) => {
         req.user = null;
         res.cookie("token", '');
-        res.status(200).send("OK");
+        return res.status(200).redirect('/user/login');
     },
     users: (req, res, next) => {
         Users

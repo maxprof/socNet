@@ -178,7 +178,7 @@ module.exports = {
     logout: function logout(req, res) {
         req.user = null;
         res.cookie("token", '');
-        res.status(200).send("OK");
+        return res.status(200).redirect('/user/login');
     },
     users: function users(req, res, next) {
         _User2.default.find().populate('avatar').exec(function (err, users) {
