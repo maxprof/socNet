@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "babel src/ -d server/ --presets es2015",
-    "watch": "babel src/ -d server/ --presets es2015 -w"
+    "watch": "babel src/ -d server/ --presets es2015 -w",
+    "start": "cd server && node app.js"
   },
   "author": "",
   "license": "ISC",
